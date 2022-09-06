@@ -1,0 +1,83 @@
+\usetikzlibrary{positioning}
+\usetikzlibrary{trees}
+\usetikzlibrary{fit}
+\begin{tikzpicture}
+
+      \node (transport) [matrix,shape=rectangle,draw,ampersand replacement=\&,fill=blue!20,column sep=5pt]
+      {
+      		\node[shape=rectangle,draw,fill=cyan!20] (reader) {
+      		\texttt{internal-aod-reader}
+      		};
+      		\&
+      		\node[shape=rectangle,draw,fill=magenta!10] (process) {
+      		\texttt{o2-analysistutorial-histograms}
+      		}; \\
+	      \node {};
+	      \&
+	      \node {\textbf{Transport layer (FairMQ)}}; \\
+      };
+
+      \node (task) [matrix,shape=rectangle,draw,fill=blue!20,above=45pt of transport,ampersand replacement=\<,column sep=1pt, row sep=1pt] {
+            	      \node {
+            	   	\begin{tabular}{c|c|c}
+				\rowcolor{green!20}
+		      		{} & $Z_{\mathrm{vtx}}$ & $N_{\mathrm{trk}}$ \\
+		      		\hline
+		      		\rowcolor{green!20}
+		      		1 & {} & {} \\
+		      		\hline
+		      		\rowcolor{green!20}
+		      		2 & {} & {} \\
+		      		\rowcolor{green!20}
+		      		\multicolumn{3}{c}{...}
+			\end{tabular}
+		      \begin{tabular}{c|c|c}
+		      		\rowcolor{red!20}
+		      		{} & $p_{\mathrm{T}}$ & $\eta$ \\
+		      		\hline
+		      		\rowcolor{red!20}
+		      		1 & {} & {} \\
+		      		\hline
+		      		\rowcolor{red!20}
+		      		2 & {} & {} \\
+		      		\rowcolor{red!20}
+		      		\multicolumn{3}{c}{...}
+			\end{tabular}
+	      };\\
+     		\node {\colorbox{magenta!10}{\texttt{void process(\colorbox{green!20}{aod::Collision} const\& c,  \colorbox{red!20}{aod::Tracks} const\& t)}}}; \\
+      		\node {\textbf{DPL Analysis Framework}}; \\
+      };
+
+      \node [matrix,shape=rectangle,draw,fill=gray!20, left=10pt of transport, column sep=1em] (root) {
+	      \node {\colorbox{gray!40}{\textbf{ROOT file(s)}}}; \\
+	      \node[shape=rectangle,text width=60pt] (df) {
+			DF:
+			$-$~\colorbox{green!20}{O2collision}
+			$-$~\colorbox{red!20}{O2track}
+			$-$~O2muon
+			$-$~...
+	      }; \\
+      };
+
+      \node [matrix,shape=rectangle,draw,fill=gray!20,right=10pt of transport] (output) {
+      		\node[fill=gray!40] {\textbf{Output}}; \\
+      		\node (histogram) {\includegraphics[width=60pt]{figures/eta.pdf}}; \\
+      };
+
+      \node (DPL) [matrix,shape=rectangle,draw,fill=blue!20,above=10pt of transport,,ampersand replacement=\&] {
+
+	      \node {\textbf{Data Processing Layer}}; \\
+      };
+      \node (shared) [matrix,shape=rectangle,draw,fill=blue!20,below=10pt of transport] {
+      		\node [shape=rectangle,draw,fill=green!20] {\texttt{arrow::Table}}; & \node [shape=rectangle,draw,fill=red!20] {\texttt{arrow::Table}}; \\
+      		\node {\textbf{Shared memory backend}}; & \node {}; \\
+      };
+
+      \draw[-stealth] (root) edge (reader);
+      \draw[-stealth] (reader) edge (shared);
+      \draw[-stealth] (shared) edge (transport);
+      \draw[-stealth] (transport) edge (DPL);
+      \draw[-stealth] (DPL) edge (task);
+      \draw[-stealth] (process) edge (output);
+
+\end{tikzpicture}

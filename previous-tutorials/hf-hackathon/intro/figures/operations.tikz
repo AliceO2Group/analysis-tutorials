@@ -1,0 +1,142 @@
+\usetikzlibrary{positioning}
+\newcolumntype{x}{>{\columncolor{green!20}}c}
+\newcolumntype{y}{>{\columncolor{red!20}}c}
+\usetikzlibrary{arrows}
+\begin{tikzpicture}
+\node (tab1) {
+\begin{tabular}{c|c|c|c|}
+{} & X & Y & Z \\
+\hline
+\rowcolor{green!20} 
+1 & {} & {} & {} \\
+\hline
+\rowcolor{green!20}
+2 & {} & {} & {}
+\end{tabular}
+};
+\node (p) [right=1pt of tab1] {$+$};
+\node (tab2) [right=1pt of p] {
+\begin{tabular}{c|c|c|c|}
+{} & A & B & C \\
+\hline
+\rowcolor{red!20} 
+1 & {} & {} & {} \\
+\hline
+\rowcolor{red!20}
+2 & {} & {} & {}
+\end{tabular}
+};
+\node (join) [above=35pt of p] {\LARGE \operation{Join}};
+\node (pp1) [below=1pt of p] {};
+\node (pp2) [below=25pt of p] {};
+\draw [-stealth] (pp1) -- (pp2);
+\node (tab3) [below=30pt of p] {
+\begin{tabular}{c|x|x|x|y|y|y|}
+\rowcolor{LightBackground}
+{} & X & Y & Z & A & B & C \\
+\hline
+1 & {} & {} & {} & {} & {} & {} \\
+\hline
+2 & {} & {} & {} & {} & {} &{}
+\end{tabular}
+};
+
+\node (tab4) [right=15pt of tab2] {
+\begin{tabular}{c|c|c|c|}
+{} & X & Y & Z \\
+\hline
+\rowcolor{green!20} 
+1 & {} & {} & {} \\
+\hline
+\rowcolor{green!20}
+2 & {} & {} & {} \\
+\hline
+\rowcolor{green!20}
+3 & {} & {} & {} \\
+\hline
+\rowcolor{green!20}
+4 & {} & {} & {}
+\end{tabular}
+};
+\node (arr) [right=-5pt of tab4] {};
+\node (arr2) [right=10pt of arr] {};
+\draw[-stealth] (arr) -- (arr2);
+\node (tab5) [right=-2pt of arr2] {
+\begin{tabular}{c|c|c|c|}
+{} & X & Y & Z \\
+\hline
+\rowcolor{green!20} 
+1 & {} & {} & {} \\
+\hline
+\rowcolor{red!20}
+2 & {} & {} & {} \\
+\hline
+\rowcolor{red!20}
+3 & {} & {} & {} \\
+\hline
+\rowcolor{green!20}
+4 & {} & {} & {}
+\end{tabular}
+};
+\node (filter) [above=35pt of arr] {\LARGE \operation{Filter/Partition}};
+
+\node (tab6) [right=10pt of tab5] {
+\begin{tabular}{c|c|c|c|}
+{} & X & Y & Z \\
+\hline
+\rowcolor{green!20} 
+1 & {} & {} & {} \\
+\hline
+\rowcolor{blue!20}
+2 & {} & {} & {} \\
+\rowcolor{red!20}
+3 & {} & {} & {}
+\end{tabular}
+};
+\node (tab7) [right=10pt of tab6] {
+\begin{tabular}{c|c|c|c|}
+{} & A & B & C \\
+\hline
+\rowcolor{green!20} 
+1 & 1 & {} & {} \\
+\rowcolor{green!20} 
+2 & 1 & {} & {} \\
+\hline
+\rowcolor{blue!20}
+3 & 2 & {} & {} \\
+\rowcolor{blue!20}
+4 & 2 & {} & {} \\
+\rowcolor{blue!20}
+5 & 2 & {} & {} \\
+\rowcolor{red!20}
+3 & 3 & {} & {}
+\end{tabular}
+};
+\node (gg) [right=5pt of tab6] {};
+\node (grouping) [above=35pt of gg] {\LARGE \operation{Grouping}};
+
+\node (tab8) [right=30pt of tab7] {
+\begin{tabular}{c|c|c|c|}
+{} & X & Y & Z \\
+\hline
+\rowcolor{green!20} 
+1 & {} & {} & {} \\
+\hline
+\rowcolor{blue!20}
+2 & {} & {} & {} \\
+\rowcolor{red!20}
+3 & {} & {} & {}
+\end{tabular}
+};
+\node (arr3) [below=-5pt of tab8] {};
+\node (arr4) [below=10pt of arr3] {};
+\draw[-stealth] (arr3) -- (arr4);
+\node (tab9) [below=10pt of tab8] {
+\begin{tabular}{ccc}
+[\colorbox{green!20}{1},\colorbox{blue!20}{2}] & [\colorbox{green!20}{1},\colorbox{red!20}{3}] & [\colorbox{blue!20}{2},\colorbox{red!20}{3}] \\
+{[\colorbox{green!20}{1},\colorbox{green!20}{1}]} & [\colorbox{blue!20}{2},\colorbox{blue!20}{2}] & [\colorbox{red!20}{3},\colorbox{red!20}{3}]
+\end{tabular}
+};
+
+\node (combinations) [above=13pt of tab8] {\LARGE \operation{Combinations}};
+\end{tikzpicture}

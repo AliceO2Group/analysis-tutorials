@@ -1,0 +1,474 @@
+%!TeX program=lualatex
+%!TeX spellcheck=en_US
+\documentclass[10pt,lualatex,xcolor={table,svgnames},{hyperref={bookmarks=true,linktoc=all}},aspectratio=169]{beamer}
+\usetheme{o2report}
+\input{preamble.tex}
+%\usetikzlibrary{fit,calc,backgrounds,arrows}
+\usepackage{endnotes}
+\usepackage{minted}[breaklines=true,bgcolor=LightGray]
+\usepackage{lipsum}
+
+\newcommand{\logical}[1]{\textcolor{Green}{#1}}
+\newcommand{\programmatic}[1]{\textcolor{-green!40!yellow}{#1}}
+\newcommand{\notion}[1]{\textcolor{teal}{#1}}
+\newcommand{\operation}[1]{\textcolor{FireBrick}{#1}}
+
+\newcommand{\codelines}[2]{{\mintinline[bgcolor=gray!20,fontsize=#2]{cpp}|#1|}}
+\newcommand{\codeline}[1]{{\mintinline[bgcolor=gray!20,fontsize=\small]{cpp}|#1|}}
+
+\usemintedstyle{rainbow_dash}
+
+\begin{document}
+    \author[Anton Alkin]{Anton Alkin}
+    \title{O\textsuperscript{2} hands-on session}
+    \date[O\textsuperscript{2} Hackaton, 07/12/2021]{HF O\textsuperscript{2} Hackatons, 07/12/2021}
+
+    \begin{frame}{}
+        \maketitle
+    \end{frame}
+
+    \section{Introduction}
+
+    \begin{frame}{Outline}
+        \begin{columns}
+            \begin{column}{0.02\paperwidth}
+            \end{column}
+            \begin{column}[c]{0.9\paperwidth}
+                \begin{itemize}
+                    \item {\huge\bfseries Adding a task}
+                    \item {\huge\bfseries Getting the data, creating outputs}
+                    \item {\huge\bfseries Filters, Partitions, Index tables, workflows}
+                \end{itemize}
+                \vspace{1em}
+                {\small
+                    \begin{description}
+                        \item[Official documentation] \href{https://aliceo2group.github.io/analysis-framework/docs/framework/}{https://aliceo2group.github.io/analysis-framework/docs/framework/}
+                \end{description}}
+            \end{column}
+        \end{columns}
+    \end{frame}
+
+   \begin{frame}[fragile]{O2Physics build system}
+   \begin{block}{CMakeLists.txt}
+       \begin{minted}{cmake}
+o2physics_add_dpl_workflow(histograms
+                           SOURCES src/histograms.cxx
+                           PUBLIC_LINK_LIBRARIES O2::Framework
+                           COMPONENT_NAME AnalysisTutorial)
+       \end{minted}
+   \end{block}
+    \begin{block}{Adding a task}
+        \begin{enumerate}
+            \item Add a source file in an appropriate folder (we'll be using \verb|Tutorials|)
+            \item Add an entry in the corresponding \verb|CMakeLists.txt|
+            \item Recompile
+        \end{enumerate}
+    \end{block}
+   \end{frame}
+
+\begin{frame}[fragile,allowframebreaks]{Adding a task}
+    \begin{description}
+        \item[Add a source]
+            \texttt{Tutorials/src/tutorial1.cxx}
+            \begin{minted}[fontsize=\scriptsize]{cpp}
+// Copyright 2019-2020 CERN and copyright holders of ALICE O2.
+// See https://alice-o2.web.cern.ch/copyright for details of the copyright holders.
+// All rights not expressly granted are reserved.
+//
+// This software is distributed under the terms of the GNU General Public
+// License v3 (GPL Version 3), copied verbatim in the file "COPYING".
+//
+// In applying this license CERN does not waive the privileges and immunities
+// granted to it by virtue of its status as an Intergovernmental Organization
+// or submit itself to any jurisdiction.
+
+#include "Framework/runDataProcessing.h"
+#include "Framework/AnalysisTask.h"
+
+using namespace o2;
+using namespace o2::framework;
+
+struct TutorialOne {
+};
+
+WorkflowSpec defineDataProcessing(ConfigContext const& cfgc)
+{
+    return WorkflowSpec{adaptAnalysisTask<TutorialOne>(cfgc)};
+}
+            \end{minted}
+        \item[Add an entry]
+        \begin{minted}[fontsize=\scriptsize]{cmake}
+o2physics_add_dpl_workflow(tutorial1
+                           SOURCES src/tutorial1.cxx
+                           PUBLIC_LINK_LIBRARIES O2::Framework
+                           COMPONENT_NAME AnalysisTutorial)
+        \end{minted}
+    \item[Recompile]
+    \begin{minted}[fontsize=\footnotesize]{shell}
+% cd $ALIBUILD_WORK_DIR/BUILD/O2Physics-latest/O2Physics
+(direnv stuff)
+% ninja -j16 install
+(compilation)
+    \end{minted}
+\item[Or partially]
+\begin{minted}[fontsize=\footnotesize]{shell}
+% ninja -j16 stage/bin/o2-analysistutorial-tutorial1
+(compilation)
+\end{minted}
+    \end{description}
+\end{frame}
+
+\begin{frame}[fragile]{Running a task}
+\begin{block}{Regular way}
+\begin{minted}[fontsize=\footnotesize]{shell}
+% alienv enter O2Physics/latest
+(init stuff)
+% o2-analysistutorial-tutorial1 --aod-file path/to/AO2D.root
+\end{minted}
+\vspace{0.5ex}
+\end{block}
+\vspace{1em}
+\begin{block}{Quick testing}
+\begin{minted}[fontsize=\footnotesize]{shell}
+% ninja -j16 stage/bin/o2-analysistutorial-tutorial1
+(compilation)
+% stage/bin/o2-analysistutorial-tutorial1 --aod-file path/to/AO2D.root
+\end{minted}
+\vspace{0.5ex}
+\end{block}
+\end{frame}
+
+\begin{frame}[fragile]{Misc.}
+\begin{block}{\enquote{Solutions}}
+\begin{minted}[fontsize=\footnotesize]{shell}
+% git remote add aalkin https://github.com/aalkin/O2Physics
+% git fetch aalkin
+% git checkout aalkin/hands-on-examples
+% ls Tutorials/src/example_*.cxx
+Tutorials/src/example_1.cxx Tutorials/src/example_3.cxx Tutorials/src/example_5.cxx
+Tutorials/src/example_2.cxx Tutorials/src/example_4.cxx Tutorials/src/example_6.cxx
+Tutorials/src/example_7.cxx
+\end{minted}
+\vspace{0.5ex}
+\end{block}
+\begin{block}{Input file}
+LHC18g4, pp@13~TeV, simulation \\
+\href{http://alitrain.cern.ch/train-workdir/PWGZZ/Run3_Conversion/232_20211108-1726/test/__ALL__/AO2D.root}{http://alitrain.cern.ch/train-workdir/PWGZZ/Run3\_Conversion/232\_20211108-1726/test/\_\_ALL\_\_/AO2D.root}
+\end{block}
+\end{frame}
+
+\section{Examples}
+
+\begin{frame}[fragile]{Example 1}
+\begin{block}{Access tracks}
+\textbf{Print out track transverse momenta}
+\end{block}
+\begin{block}{Process function}
+    \begin{minted}[fontsize=\footnotesize]{cpp}
+void process(aod::Tracks const& tracks) {}
+    \end{minted}
+\end{block}
+\begin{block}{Loop over tracks}
+\begin{minted}[fontsize=\footnotesize]{cpp}
+for (auto& track : tracks) {
+    LOGP(info, "Track {} has pT = {}", track.index(), track.pt());
+}
+\end{minted}
+\end{block}
+{\footnotesize Relevant tutorial:  \href{https://github.com/AliceO2Group/O2Physics/blob/master/Tutorials/src/trackIteration.cxx}{https://github.com/AliceO2Group/O2Physics/blob/master/Tutorials/src/trackIteration.cxx} \\
+Complete example: \href{https://github.com/aalkin/O2Physics/blob/hands-on-examples/Tutorials/src/example_1.cxx}{https://github.com/aalkin/O2Physics/blob/hands-on-examples/Tutorials/src/example\_1.cxx}
+}
+\end{frame}
+
+\begin{frame}[fragile,allowframebreaks]{Example 2}
+\begin{block}{Add a histogram}
+\textbf{Add a $p_{\text{T}}$ histogram with range from 0 to 10, equal bins with width of 0.1}
+\end{block}
+\begin{block}{Histogram registry}
+\begin{minted}[fontsize=\footnotesize]{cpp}
+HistogramRegistry registry{
+    "registry",
+    {
+        {"name", "title ; axis", {HistType::kTH1F, {{n, min, max}}}}
+    }
+};
+\end{minted}
+\end{block}
+\begin{block}{Accessing histograms in registry}
+\begin{minted}[fontsize=\footnotesize]{cpp}
+// get a pointer
+auto* histo_ptr = registry.get<TH1>(HIST("name"));
+// fill single value directly - a direct wrapper for TH1::Fill
+registry.fill(HIST("name"), value, weight);
+// fill a collection using a filter
+registry.fill<aod::track:Pt>(HIST("name"), input_table, condition);
+\end{minted}
+\end{block}
+\framebreak
+\begin{block}{Simple filling}
+\begin{minted}[fontsize=\footnotesize]{cpp}
+for (auto& track : tracks) {
+    registry.fill(HIST("hpt"), track.pt());
+}
+\end{minted}
+\end{block}
+\begin{block}{Check the output}
+\begin{minted}[fontsize=\footnotesize]{shell}
+% root -l AnalysisResults.root
+root [0]
+Attaching file AnalysisResults.root as _file0...
+(TFile *) 0x7ffb94bbb5e0
+root [1] .ls
+TFile**		AnalysisResults.root
+TFile*		AnalysisResults.root
+KEY: TDirectoryFile	example-two;1	example-two
+root [2]
+\end{minted}
+
+\textcolor{red}{AnalysisResults.root \emph{will be overwritten} each time you run a workflow}
+\end{block}
+
+{\footnotesize Relevant tutorial:  \href{https://github.com/AliceO2Group/O2Physics/blob/master/Tutorials/src/histogramRegistry.cxx}{https://github.com/AliceO2Group/O2Physics/blob/master/Tutorials/src/histogramRegistry.cxx} \\
+    Complete example: \href{https://github.com/aalkin/O2Physics/blob/hands-on-examples/Tutorials/src/example_2.cxx}{https://github.com/aalkin/O2Physics/blob/hands-on-examples/Tutorials/src/example\_2.cxx}
+}
+\end{frame}
+
+\begin{frame}[fragile,allowframebreaks]{Example 3}
+\begin{block}{Add another histogram}
+\textbf{Add an event average $p_{\text{T}}$ histogram with range from 0 to 2, equal bins with widths of 0.1}
+\end{block}
+\begin{block}{Advanced data subscription: grouping}
+Now we need to access tracks per collision
+\begin{minted}[fontsize=\footnotesize]{cpp}
+void process(aod::Collision const& collision, aod::Tracks const& tracks) {}
+\end{minted}
+\notion{Note 1}: \codeline{Collision} without \enquote{s} \\
+\notion{Note 2}: in \codeline{AnalysisDataModel.h} we have \codeline{using Collision = Collisions::iterator;} \\
+\notion{General rule}: if the \emph{first} argument of the process function is an \programmatic{iterator}, all subsequent arguments, that have an \programmatic{index} connection to the first, will be \programmatic{grouped}
+\end{block}
+
+{\footnotesize Relevant tutorial:  \href{https://github.com/AliceO2Group/O2Physics/blob/master/Tutorials/src/collisionTracksIteration.cxx}{https://github.com/AliceO2Group/O2Physics/blob/master/Tutorials/src/collisionTracksIteration.cxx} \\
+    Complete example: \href{https://github.com/aalkin/O2Physics/blob/hands-on-examples/Tutorials/src/example_3.cxx}{https://github.com/aalkin/O2Physics/blob/hands-on-examples/Tutorials/src/example\_3.cxx}
+}
+\end{frame}
+
+\begin{frame}[fragile,allowframebreaks]{Example 4}
+\begin{block}{Acessing generator-level information}
+\textbf{Add a $p_{\text{T}}$ and event average $p_{\text{T}}$ histograms at generator level} \\[1em]
+\notion{Note 1}: We need either a separate task or an additional proccess function with different subscriptions \\
+\notion{Note 2}: Additional process functions require control switches \\
+\notion{Note 3}: Only one function with a name \codeline{process()} is allowed and it is executed unconditionally \\
+\notion{General rule}: Each process function (that is not named \codeline{process()}) needs a corresponding \codeline{PROCESS_SWITCH} declaration
+\end{block}
+\begin{block}{Configurables, Process switches}
+\textbf{Add an $\eta$ cut for tracks} \\[1em]
+\programmatic{Process switch} is a special case of a more generic \programmatic{Configurable} -- a variable that is set externally \\
+\notion{Note 1}: \codeline{Configurable<type> varname{"configName", default_value, "Description"};} \\
+\notion{Note 2}: \codeline{PROCESS_SWITCH(TaskType,processFunction,"Description",default_state);} \\
+\end{block}
+\framebreak
+\begin{block}{Upfront filtering}
+For cases were we only require a subsample of a collection (collisions, tracks, V0s, etc.) we can use expression-based filters \\
+
+\codelines{Filter etaFilter = nabs(aod::track::eta) <= etaCut;}{\footnotesize}
+
+This requires also declaring, which arguments should have filters applied to them \\
+\codelines{void process(aod::Collision const& collision, soa::Filtered<aod::Tracks> const& tracks)}{\footnotesize}
+\vspace{0.2ex}
+\end{block}
+\begin{block}{Additional process function}
+    \begin{minted}[fontsize=\footnotesize]{cpp}
+        void processMC(aod::McCollision const& mccollision,
+        soa::Filtered<aod::McParticles> const& particles) {}
+        // after the function
+        PROCESS_SWITCH(ExampleFour, processMC, "Process MC info", false);
+    \end{minted}
+\end{block}
+\framebreak
+\begin{block}{Setting external configuration}
+\begin{tabular}{p{0.3\linewidth}p{0.6\linewidth}}
+{\begin{minted}[fontsize=\small,breaklines]{json}
+{
+    "example-four": {
+        "etaCut": "0.5",
+        "processMC": "true"
+    }
+}
+\end{minted}
+} &
+{\begin{itemize}
+    \item On exit workflow produces \codeline{dpl-config.json}
+    \item It can be copied, edited, and used for subsequent runs
+    \item \textcolor{red}{Process switches can only be changed via JSON}
+\end{itemize}
+} \\
+\end{tabular}
+
+\begin{minted}[fontsize=\small,bgcolor=gray!20]{shell}
+% o2-analysistutorial-example-4 --configuration=json://example_4.json
+\end{minted}
+\end{block}
+{\footnotesize Relevant tutorial:  \href{https://github.com/AliceO2Group/O2Physics/blob/master/Tutorials/src/multiProcess.cxx}{https://github.com/AliceO2Group/O2Physics/blob/master/Tutorials/src/multiProcess.cxx} \\
+    Complete example: \href{https://github.com/aalkin/O2Physics/blob/hands-on-examples/Tutorials/src/example_4.cxx}{https://github.com/aalkin/O2Physics/blob/hands-on-examples/Tutorials/src/example\_4.cxx}
+}
+\end{frame}
+
+\begin{frame}[fragile,allowframebreaks]{Example 5}
+\begin{block}{Joining tables, building workflows}
+\textbf{Replace event average $p_{\text{T}}$ histograms with 2-dimensional vs. V0M multiplicity}\\[1em]
+
+\notion{Note 1}: We now require extra collision information, that is produced by other task \\
+\notion{Note 2}: This is achieved by directly subscribing to required tables, but in specific cases these table are designed to be \programmatic{joined} with existing ones \\
+\notion{Note 3}: Table \codeline{aod::Mults} is produced by \codeline{o2-analysis-multiplicity-table} \\
+\notion{Note 4}: We can use iterators from joins: \codeline{soa::Join<Collisions, Mults>::iterator}
+\end{block}
+
+\begin{block}{At the generator level?}
+No such additional table for MC collisions, so let's just count particles in V0 acceptance
+\begin{minted}[fontsize=\small,bgcolor=gray!20,breaklines]{cpp}
+if ((particle.eta() > 2.7f and particle.eta() < 5.1f) or (particle.eta() > -3.7f and particle.eta() < -1.7f))
+\end{minted}
+\end{block}
+\framebreak
+\begin{block}{Combining workflows}
+\begin{minted}[fontsize=\small]{shell}
+% o2-analysis-multiplicity-table --configuration=json://example_5.json |\
+    o2-analysistutorial-example-5 --configuration=json://example_5.json
+\end{minted}
+
+\textcolor{red}{For each workflow to be able to build correct topology, they all need to know \emph{all} process switches, the easiest way is to give the same (complete) configuration to each of them}
+\vspace{0.2ex}
+\end{block}
+\begin{block}{Caveats}
+\notion{Note 1}: We can no longer use filter on MC particles -- we need to count those in different $\eta$ ranges \\
+\notion{Note 2}: We are looking at all MC collisions, even those that do not have reconstructed counterpart \\
+
+Can we do better? See next example.
+\end{block}
+
+{\footnotesize Relevant tutorial:  \href{https://github.com/AliceO2Group/O2Physics/blob/master/Tutorials/src/multiplicityEventTrackSelection.cxx}{https://github.com/AliceO2Group/O2Physics/blob/master/Tutorials/src/multiplicityEventTrackSelection.cxx} \\
+    Complete example: \href{https://github.com/aalkin/O2Physics/blob/hands-on-examples/Tutorials/src/example_5.cxx}{https://github.com/aalkin/O2Physics/blob/hands-on-examples/Tutorials/src/example\_5.cxx}
+}
+\end{frame}
+
+\begin{frame}[fragile,allowframebreaks]{Example 6}
+\begin{block}{Derived tables}
+\textbf{Add a joinable table with multiplicity information for MC collisions (V0M only) \codeline{aod::MultsGen}}
+
+\notion{Note 1}: Look at \href{https://github.com/AliceO2Group/O2Physics/blob/master/Common/DataModel/Multiplicity.h}{Common/DataModel/Multiplicity.h} \\
+\notion{Note 2}: Creating a table requires an \emph{additional} task: our main task will subscribe to the result \\
+\notion{Note 3}: To fill a table one uses \codeline{Produces<TableType> cursor;} in the definition of the producer \\
+\notion{Note 4}: The \programmatic{cursor} is used to fill the table by calling \codeline{cursor(col1_value, col2_value, ...);} \\
+\end{block}
+\vspace{1em}
+\begin{block}{Adding an extra task}
+\begin{itemize}
+    \item Declare the new table in the same source file\footnote{It is acceptable for tables that are not intended to be shared with other workflows, otherwise create a common header}
+    \item Declare the task in the same source file: \codeline{struct PreTask {};}
+    \item \textcolor{red}{Add it to \codeline{defineDataProcessing(ConfigContext const& cfgc)}}
+\end{itemize}
+\notion{Note 1}: This task can once again use a filter to select particles in V0M acceptance
+\end{block}
+\framebreak
+\begin{block}{Using derived tables}
+Derived tables are used \emph{in an exactly same way} as any other tables!
+
+\begin{minted}[fontsize=\small]{cpp}
+void processMC(
+    soa::Join<aod::McCollisions, aod::MultsGen>::iterator const& mccollision,
+    soa::Filtered<aod::McParticles> const& particles) {}
+\end{minted}
+
+\notion{Note 1}: We can once again use a filter to apply $\eta$ cut
+\end{block}
+
+{\footnotesize Relevant tutorial:  \href{https://github.com/AliceO2Group/O2Physics/blob/master/Tutorials/src/associatedExample.cxx}{https://github.com/AliceO2Group/O2Physics/blob/master/Tutorials/src/associatedExample.cxx} \\
+    Complete example: \href{https://github.com/aalkin/O2Physics/blob/hands-on-examples/Tutorials/src/example_6.cxx}{https://github.com/aalkin/O2Physics/blob/hands-on-examples/Tutorials/src/example\_6.cxx}
+}
+\end{frame}
+
+\begin{frame}[fragile,allowframebreaks]{Example 7}
+    \begin{block}{Index tables}
+    \textbf{Only fill MC collisions that have reconstructed counterpart}
+
+    \notion{Note 1}: We have predefined table \codeline{aod::McCollisionsLabels}, joinable with \codeline{aod::Collisions} to go from reco to gen via \programmatic{index} \\
+    \notion{Note 2}: To reverse (or combine) 1-to-1 index connections we have a special mechanism of \programmatic{index tables} \\
+    \notion{Note 3}: To achieve our goal we need to build an index table that is joinable with MC collisions and contains corresponding index to reco collisions \\
+    \notion{Note 4}: \codeline{DECLARE_INDEX_TABLE_USER(Name, Key, Desc, joinable_idx, idx2, ...);} \\
+    \notion{Note 5}: We will need to declare index columns we want to have in this table \\
+    \hspace{3em} \codeline{DECLARE_INDEX_COLUMN(Target, getter);} \\
+    \notion{Note 6}: \textcolor{red}{Simplified macro requires as target table name without final \enquote{s}: for example \codeline{Collision}} \\
+    \notion{Note 7}: We need collisions to be mached to MC collisions \emph{through} MC collisions table, therefore we need \codelines{using CollisionsWLabels = soa::Join<aod::Collisions, aod::McCollisionLabels>;}{\scriptsize} as a target for corresponding index column
+    \end{block}
+\framebreak
+    \begin{block}{Solution}
+\begin{minted}[fontsize=\small,breaklines]{cpp}
+using CollisionsWLabels = soa::Join<aod::Collisions, aod::McCollisionLabels>;
+namespace o2::aod::idx
+{
+    DECLARE_SOA_INDEX_COLUMN(CollisionsWLabel, collision);
+    DECLARE_SOA_INDEX_COLUMN(McCollision, mccollision);
+} // namespace o2::aod::idx
+namespace o2::aod
+{
+    DECLARE_SOA_INDEX_TABLE_USER(MatchedMCRec, McCollisions, "MMCR", idx::McCollisionId, idx::CollisionsWLabelId)
+} // namespace o2::aod
+\end{minted}
+    \end{block}
+\framebreak
+\begin{block}{Using index tables}
+\notion{Note 1}: Non-exclusive index tables are \emph{joinable} with the tables, that are used for the first index column \\
+\notion{Note 2}: In our case \codeline{soa::Join<aod::McCollisions, aod::MultsGen, aod::MatchedMCRec>} \\
+\notion{Note 3}: \textcolor{red}{Index table should be always last in joins} \\
+\notion{Note 4}: In non-exclusive index tables index may be unset: one should always check with \codeline{.has_<getter>()} method before trying to access it
+\end{block}
+
+\begin{block}{Hint}
+\begin{minted}[fontsize=\scriptsize,breaklines]{cpp}
+void processMC(
+   soa::Join<aod::McCollisions, aod::MultsGen, aod::MatchedMCRec>::iterator const& matched,
+   soa::Filtered<aod::McParticles> const& particles)
+{
+    if (!matched.has_collision()) {
+        return;
+    }
+  // ...
+}
+\end{minted}
+\end{block}
+
+{\footnotesize Relevant tutorial:  \href{https://github.com/AliceO2Group/O2Physics/blob/master/Tutorials/src/associatedExample.cxx}{https://github.com/AliceO2Group/O2Physics/blob/master/Tutorials/src/associatedExample.cxx} \\
+    Complete example: \href{https://github.com/aalkin/O2Physics/blob/hands-on-examples/Tutorials/src/example_7.cxx}{https://github.com/aalkin/O2Physics/blob/hands-on-examples/Tutorials/src/example\_7.cxx}
+}
+\end{frame}
+
+\begin{frame}[fragile,allowframebreaks]{Example 5 with partitions}
+    \begin{block}{Partitions}
+\textbf{Is it possible to define several subsamples of a collection with filters?}\\
+
+\notion{Note 1}: This is what \codeline{Partition<TableType>} is for \\
+\notion{Note 2}: It is defined similarly to a \programmatic{Filter}, however it is independent of the process function arguments \\
+\notion{Note 3}: \textcolor{red}{However the table it is defined for needs to be subscribed} \\
+\notion{Note 4}: We can even include the \codeline{isPhysicalPrimary()} requirement \\
+    \end{block}
+
+\begin{block}{Solution}
+\begin{minted}[fontsize=\scriptsize,breaklines]{cpp}
+Partition<aod::McParticles> central = nabs(aod::mcparticle::eta) < etaCut && (aod::mcparticle::flags & (uint8_t)o2::aod::mcparticle::enums::PhysicalPrimary) == (uint8_t)o2::aod::mcparticle::enums::PhysicalPrimary;
+Partition<aod::McParticles> v0m = ((aod::mcparticle::eta > 2.7f && aod::mcparticle::eta < 5.1f) || (aod::mcparticle::eta > -3.7f && aod::mcparticle::eta < -1.7f)) && (aod::mcparticle::flags & (uint8_t)o2::aod::mcparticle::enums::PhysicalPrimary) == (uint8_t)o2::aod::mcparticle::enums::PhysicalPrimary;
+\end{minted}
+\end{block}
+
+{\footnotesize Relevant tutorial:  \href{https://github.com/AliceO2Group/O2Physics/blob/master/Tutorials/src/multiplicityEventTrackSelection.cxx}{https://github.com/AliceO2Group/O2Physics/blob/master/Tutorials/src/multiplicityEventTrackSelection.cxx} \\
+    Complete example: \href{https://github.com/aalkin/O2Physics/blob/hands-on-examples/Tutorials/src/example_5_partitions.cxx}{https://github.com/aalkin/O2Physics/blob/hands-on-examples/Tutorials/src/example\_5\_partitions.cxx}
+}
+\end{frame}
+
+\begin{frame}{The end}
+    \vspace{0.15\textheight}
+    \centering
+    \Huge
+    \textbf{Thank you!}
+\end{frame}
+
+\end{document}

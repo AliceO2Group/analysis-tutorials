@@ -1,0 +1,54 @@
+\usepackage{amssymb,amsmath}
+\usepackage{graphicx}
+\graphicspath{{figures/}}
+\usepackage{xcolor}
+\usepackage{colortbl}
+\usepackage{xltxtra}
+\usepackage{fontspec}
+\usepackage{unicode-math}
+\usepackage{appendixnumberbeamer}
+\usepackage{wasysym}
+
+\usepackage{csquotes}
+\usepackage{pbox}
+\usepackage{xhfill}
+\usefonttheme{professionalfonts}
+\setmainfont{Source Serif Pro}%{Cambria}%
+\setsansfont{Source Sans Pro}%{Cambria}%
+\defaultfontfeatures{}
+\setmonofont{Source Code Pro}%{Cambria}%
+\setmathfont{Cambria Math}
+%\usepackage{mathastext}
+\usepackage{bm,tabu,booktabs,multirow}
+\usepackage{ragged2e}
+\usepackage{multicol}
+
+\tolerance=100
+\setcounter{tocdepth}{3}
+
+\usepackage{xfrac}
+\usepackage{xspace,indentfirst}%,paralist}
+
+\setlength{\intextsep}{2pt plus 3pt}% Vertical space above & below [h] floats
+\setlength{\textfloatsep}{2pt plus 3pt}% Vertical space below (above) [t] ([b]) floats
+\setlength{\abovecaptionskip}{2pt plus 3pt}%
+\setlength{\belowcaptionskip}{2pt plus 1pt}%
+
+\usepackage{etoolbox}
+\appto\normalsize{%
+	\abovedisplayskip=0pt
+	\belowdisplayskip=0pt
+	\abovedisplayshortskip=0pt
+	\belowdisplayshortskip=0pt
+}
+\appto\small{%
+	\abovedisplayskip=0pt
+	\belowdisplayskip=0pt
+	\abovedisplayshortskip=0pt
+	\belowdisplayshortskip=0pt
+}
+
+\usepackage[permil]{overpic}
+
+\usetikzlibrary{arrows.meta,graphs,graphdrawing}
+\usegdlibrary{layered,trees,force}

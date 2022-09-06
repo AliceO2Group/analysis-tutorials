@@ -1,0 +1,389 @@
+%!TeX program=lualatex
+%!TeX spellcheck=en_US
+\documentclass[10pt,lualatex,xcolor={table,svgnames},{hyperref={bookmarks=true,linktoc=all}},aspectratio=169]{beamer}
+\usetheme{o2report}
+\input{preamble.tex}
+%\usetikzlibrary{fit,calc,backgrounds,arrows}
+\usepackage{endnotes}
+\usepackage{minted}[breaklines=true,bgcolor=LightGray]
+\usepackage{lipsum}
+
+\newcommand{\logical}[1]{\textcolor{Green}{#1}}
+\newcommand{\programmatic}[1]{\textcolor{-green!40!yellow}{#1}}
+\newcommand{\notion}[1]{\textcolor{teal}{#1}}
+\newcommand{\operation}[1]{\textcolor{FireBrick}{#1}}
+
+\newcommand{\codelines}[2]{{\mintinline[bgcolor=gray!20,fontsize=#2]{cpp}|#1|}}
+\newcommand{\codeline}[1]{{\mintinline[bgcolor=gray!20,fontsize=\footnotesize]{cpp}|#1|}}
+
+\usemintedstyle{rainbow_dash}
+
+\begin{document}
+    \author[Anton Alkin]{Anton Alkin}
+    \title{\hspace{3em} Introduction into O\textsuperscript{2} \\ \hspace{3em}  Analysis Framework}
+    \date[O\textsuperscript{2} Hackaton, 07/12/2021]{HF \& DQ O\textsuperscript{2} Hackatons, 07/12/2021}
+
+    \begin{frame}{}
+        \maketitle
+    \end{frame}
+
+    \begin{frame}{Outline}
+        \begin{columns}
+            \begin{column}{0.1\paperwidth}
+            \end{column}
+            \begin{column}[c]{0.9\paperwidth}
+                \begin{itemize}
+                    \item {\huge\bfseries Analysis Paradigm Shift}
+                    \item {\huge\bfseries Data Model and Data Manipulation}
+                    \item {\huge\bfseries Analysis Tasks and Workflows}
+                \end{itemize}
+                \vspace{1em}
+                {\small
+                    \begin{description}
+                        \item[Official documentation] \href{https://aliceo2group.github.io/analysis-framework/docs/framework/}{https://aliceo2group.github.io/analysis-framework/docs/framework/}
+                \end{description}}
+            \end{column}
+        \end{columns}
+    \end{frame}
+
+    \section{New Paradigm}
+    \begin{frame}{DPL Analysis Framework}
+        \centering%
+        \resizebox{\textwidth}{!}{\input{figures/principal.tikz}}
+    \end{frame}
+
+\begin{frame}[shrink=14]{Main differences from Run1/2}
+    \vspace{2ex}
+    \begin{columns}
+        \begin{column}{0.32\textwidth}
+            \begin{block}{Data Model}
+                \begin{itemize}
+                    \item Interconnected Tables instead of containers with object instances
+                    \item Reversed access hierarchy: e.g. \logical{Tracks} \emph{refer} to \logical{Collisions}, while previously \logical{Collisions} \emph{contained} \logical{Tracks}
+                    \item Optimized for \emph{bulk operations} rather than traditional loops
+                    \item Only necessities are stored: processing power is more accessible than disk space
+                \end{itemize}
+                \smallskip
+            \end{block}
+        \end{column}
+        \begin{column}{0.32\textwidth}
+            \begin{block}{Processing Paradigm}
+                \begin{itemize}
+                    \item \programmatic{Workflow} as a collection of factorized \programmatic{Tasks}, exchanging \programmatic{Tables}, instead of a single Task
+                    \item Allows re-using of intermediate data (especially when running on \programmatic{Hyperloop})
+                    \item Allows modular analyses constructed from common blocks
+                    \item Allows optimization in the background
+                \end{itemize}
+                \smallskip
+            \end{block}
+        \end{column}
+        \begin{column}{0.32\textwidth}
+            \begin{block}{User Interface}
+                \begin{itemize}
+                    \item Keeps familiar notions of \notion{Analysis Task} and \enquote{objects} -- row accessors to \programmatic{Tables}
+                    \item Adjusting for the Data Model differences, allows legacy analysis code to be used with reasonably few modifications
+                    \item Provides declarative tools for defining bulk operations without explicit loops and double loops
+                    \item \emph{Still in development} -- tell us what your particular analysis needs
+                \end{itemize}
+                \smallskip
+            \end{block}
+        \end{column}
+    \end{columns}
+\end{frame}
+
+\section{Data Model}
+\begin{frame}[shrink=11]{Overview}
+    \vspace{2ex}
+	\begin{columns}
+    \begin{column}{0.45\textwidth}
+        \begin{block}{How processing is organized}
+            \begin{itemize}
+                \item \operation{Piping} of data through a set of connected \programmatic{workflows}
+                \item \programmatic{Dataframe} as a self-contained unit of processing (following Run3 requirements)
+                \item \programmatic{Tasks} process one \programmatic{Dataframe} at once and send out their outputs per-\programmatic{Dataframe}
+                \item Data is immutable, \programmatic{Tasks} can only \operation{create} new \programmatic{Tables} or histograms, but not modify existing ones
+                \item Data stays in shared memory, single entity accessible to all of the \programmatic{Tasks}
+                \item Flattened data structures allow to leverage memory streaming
+            \end{itemize}
+        \end{block}
+    \end{column}
+    \begin{column}{0.45\textwidth}
+        \begin{block}{How the data is organized}
+            \begin{itemize}
+                \item \operation{Structure-of-arrays} instead of familiar from Run2 \operation{array-of-structures}
+                \item Arrays(referred to as \programmatic{Columns}) are organized in logical \programmatic{Tables}, corresponding to physical concepts of \logical{Collisions}, \logical{Tracks} etc.
+                \item \programmatic{Tables} may refer to other \programmatic{Tables} through \programmatic{Index Columns} that contain row numbers
+                \item \programmatic{Tables} that correspond row-to-row and have a same number of rows can be \operation{Joined}
+                \item \programmatic{Tables} that correspond row-to-row but have a different number of rows can be tied through an \programmatic{Index Table}
+            \end{itemize}
+        \end{block}
+    \end{column}
+    \end{columns}
+\end{frame}
+
+\begin{frame}[fragile,shrink=5]{Overview (cont.)}
+    \vspace{2ex}
+	\begin{columns}
+    \begin{column}{0.4\textwidth}
+        \begin{block}{Some technical details}
+            \begin{itemize}
+                \item A \programmatic{Table} is defined as a unique C++ type, templated on \programmatic{Columns}, themselves unique C++ types
+                \item Underlying contiguous arrays in memory are \emph{immutable} -- no data is removed or copied in common operations such as \operation{Grouping}, \operation{Filtering} or \operation{Partitioning}
+                \item \programmatic{Tables} can be read from or written into a ROOT TTree
+                \item New \programmatic{Tables} can be defined and created by users
+            \end{itemize}
+        \end{block}
+    \end{column}
+    \begin{column}{0.55\textwidth}
+        \begin{minted}[bgcolor=gray!30,fontsize=\footnotesize,autogobble]{cpp}
+ namespace bc
+ {
+     DECLARE_SOA_COLUMN(RunNumber, runNumber, int);
+     DECLARE_SOA_COLUMN(GlobalBC, globalBC,
+     uint64_t);
+     DECLARE_SOA_COLUMN(TriggerMask, triggerMask,
+     uint64_t);
+ } // namespace bc
+
+ DECLARE_SOA_TABLE(BCs, "AOD", "BC",
+ o2::soa::Index<>,
+ bc::RunNumber, bc::GlobalBC,
+ bc::TriggerMask);
+ using BC = BCs::iterator;
+        \end{minted}
+    \end{column}
+\end{columns}
+\end{frame}
+
+\begin{frame}{Data Model}
+     \vspace{-1ex}%
+     \centering\includegraphics[width=0.9\textwidth]{figures/aod-data-model.pdf}
+\end{frame}
+
+\begin{frame}{Data Model (cont.)}%
+   \centering \resizebox{!}{0.5\linewidth}{\hspace{-2ex}\input{figures/columns.tikz}}%
+\end{frame}
+
+\begin{frame}{Declarations}
+%    \vspace{2ex}
+\begin{block}{Columns}
+    \begin{description}
+        \item[Regular] \codeline{DECLARE_SOA_COLUMN(Name,getter,type);}
+        \item[Index] \codeline{DECLARE_SOA_INDEX_COLUMN(OriginTable,getter);}
+        \item[Dynamic] \codeline{DECLARE_SOA_DYNAMIC_COLUMN(Name,getter,Lambda);}
+        \item[Expression] \codeline{DECLARE_SOA_EXPRESSION_COLUMN(Name,getter,type,expression);}
+    \end{description}
+\end{block}%
+\vspace{2ex}
+	\begin{block}{Tables}
+    \begin{description}
+        \item[Regular] \codeline{DECLARE_SOA_TABLE(Name, Origin, Descr,Column1, Column2, ...);}
+        \item[Extended] \codeline{DECLARE_SOA_EXTENDED_TABLE(Name,Base,Descr,ExprCol1, ExprCol2, ...);}
+        \item[Index] \codeline{DECLARE_SOA_INDEX_TABLE(Name, Key, Descr, IndexCol1, IndexCol2, ..);}
+    \end{description}
+    \smallskip
+\end{block}
+\end{frame}
+
+\begin{frame}{Data Manipulation and Filtering}
+    \begin{block}{}
+        \centering\resizebox{\linewidth}{!}{\input{figures/operations.tikz}}
+    \end{block}
+    \begin{block}{}
+        \begin{itemize}
+            \item {\codeline{soa::Join<aod::Tracks,aod::TracksExtra,aod::TracksCov>}}
+            \item {\codeline{soa::Filter<soa::Join<aod::Collisions,aod::Hashes>>}}
+            \item {\codeline{void process(aod::Collision const& c, aod::Tracks const& t)}}
+            \item {\codeline{for (auto& [t1,t2] : selfCombinations{"fCategory",5,-1,tracks,tracks})}}
+        \end{itemize}
+    \end{block}
+\end{frame}
+
+\begin{frame}{Expressions}
+    \begin{block}{}
+        {\footnotesize\codeline{Filter f = nabs(aod::track::eta) < etaCut && aod::track::pt > ptCut;}}
+
+        {\footnotesize\codeline{Filter g = (aod::track::flags & someBit != 0);}}
+
+        {\footnotesize\codeline{Partition<Tracks> negative = aod::track::signed1Pt < 0;}}
+
+        {\footnotesize\codeline{DECLARE_SOA_EXPRESSION_COLUMN(Pt, pt, float, nabs(1.f / aod::fwdtrack::signed1Pt));}}
+    \end{block}
+    \begin{block}{Expressions}
+        \begin{itemize}
+            \item Almost arbitrary C++ expressions with columns as operands (arithmetic and bitwise operations)
+            \item Can be used to define \programmatic{filters} and \programmatic{partitions}, \programmatic{expression columns}
+            \item Several math functions can be used (absolute value, trigonometric, square/cubic root, log/exp etc.)
+            \item Conditional expressions are available: {\footnotesize\codeline{ifnode(condition, true_exp, false_exp)}}
+            \item These are \emph{recipes}, actual computation only happens when needed
+        \end{itemize}
+    \end{block}
+\end{frame}
+
+\begin{frame}{Using tables}
+    \begin{block}{Immutable data}
+        \begin{itemize}
+            \item Underlying data \emph{is never changed}: arrays in shared memory
+            \item A \programmatic{Table} is an object, that \emph{views} the data in a certain way
+            \item \programmatic{Join} is a \emph{combined view}
+            \item \programmatic{Filter/Partition} is a view with a mask
+        \end{itemize}
+    \end{block}
+    \vspace{1.5ex}
+    \begin{block}{Iterators}
+        \begin{itemize}
+            \item An \programmatic{Iterator} (\codeline{Table::iterator}) is an object that views a current \emph{row} of a \programmatic{Table}
+            \item It can be used to scroll through the table, access values in the current row, calculate dynamic columns or follow indices from the current row
+            \item It is relatively \emph{costly} to construct -- avoid creating iterators in loops -- re-use
+            \item Following an index creates an iterator of the target table
+        \end{itemize}
+    \vspace{0.5ex}
+    \end{block}
+\end{frame}
+
+\begin{frame}[shrink=3]{Creating tables}
+    \vspace{1em}
+    \begin{block}{Declaration}
+        \begin{itemize}
+            \item Tables are defined by their C++ type and attached static metadata
+            \item All tables have to be declared, user tables can be added just as the ones in the core data model
+            \item User-defined extended and index tables use \codeline{*_USER()} version of the macros and their creation needs to be explicitly requested
+        \end{itemize}
+    \end{block}
+    \begin{block}{Derived, Extended and Index tables}
+        \begin{description}
+            \item [\codeline{Produces<DerivedTable> cursor;}] Derived tables are directly filled, row by row, by calling the cursor, created by \codeline{Produces<>} template. Table is only created after the filling task finishes.
+            \item [\codeline{Spawns<ExtendedTable> handle;}] User-defined extended tables need to be requested by adding \codeline{Spawns<>} template to the task. The table is created before the task is run and is accessible through the \codeline{handle} variable.
+            \item [\codeline{Builds<IndexTable> handle;}] User-defined Index tables need to be requested by adding \codeline{Builds<>} template to the task. The table is created before the task is run and is accessible through the \codeline{handle} variable.
+        \end{description}
+    \end{block}
+\end{frame}
+
+\section{Analysis Task}
+\begin{frame}[fragile]{Analysis Task}
+    \centering
+    \begin{tabular}{p{0.1\textwidth}p{0.8\textwidth}}
+        {\rotatebox[origin=r]{90}{\centering \programmatic{Boilerplate} \ \ \ \ \ }} & {\scriptsize
+            \begin{minted}[linenos,breaklines]{c++}
+#include "Framework/runDataProcessing.h"
+#include "Framework/AnalysisTask.h"
+
+using namespace o2;
+using namespace o2::framework;
+                \end{minted}
+            } \\
+            {\rotatebox[origin=r]{90}{\centering \programmatic{Task} \ \ \ \ \ }} & {\scriptsize
+                \begin{minted}[linenos,breaklines,autogobble,firstnumber=6]{c++}
+struct MyTask {
+    ...
+};
+            \end{minted}
+        } \\
+    {\rotatebox[origin=r]{90}{\centering \programmatic{Boilerplate} \ \ \ \ }} & {\scriptsize
+        \begin{minted}[linenos,breaklines,autogobble,firstnumber=10]{c++}
+WorkflowSpec defineDataProcessing(ConfigContext const& cfgc)
+{
+    return WorkflowSpec{
+        adaptAnalysisTask<MyTask>(cfgc)
+    };
+}
+        \end{minted}
+    }
+    \end{tabular}
+\end{frame}
+
+\begin{frame}[fragile]{Analysis Task}
+    \centering
+    \begin{tabular}{p{0.1\textwidth}p{0.8\textwidth}}
+        {\rotatebox[origin=r]{90}{\centering \programmatic{Declarative} \ \ \ \ \ \ \ \ \ \ \ \ }} & {\scriptsize
+            \begin{minted}[linenos,breaklines,autogobble]{c++}
+struct MyTask {
+    Produces<MyTable> mt;            //
+    Spawns<MyExtension> me;          // Creation of new tables
+    Builds<MyIndex> mi;              //
+    HistogramRegistry registry{"registry",
+        {{"h","h",{HistType::kTH1F, {{10, -1, 1}}}}}
+    };
+    Filter f = track::pt > 0.5;
+    Configurable<float> etaCut{"etaCut", 1.0f, "eta cut"};
+    Filter e = nabs(track::eta) < etaCut;
+    Partition<Tracks> negativeSide = track::eta < 0;
+                \end{minted}
+            } \\
+            {\rotatebox[origin=r]{90}{\centering \programmatic{Imperative} \ \ \ \ \ \ \ }} & {\scriptsize
+                \begin{minted}[linenos,breaklines,autogobble,firstnumber=13]{c++}
+    void process(Collision const& col, soa::Filtered<Tracks> const& tracks){
+        ...
+        mt(col1, col2, col3);
+        ...}
+    void anotherProcess(McCollision const& mccol, McParticles const& particles){};
+    PROCESS_SWITCH(MyAnalysisTask,anotherProcess,"Process MC", false);
+}
+            \end{minted}
+        }
+    \end{tabular}
+\end{frame}
+
+\begin{frame}{Declarative features}
+    \begin{block}{Configurables}
+        \begin{itemize}
+            \item A variable that can be set externally: single, 1d array, 2d array, labeled 2d array
+            \item Can be set via command line, JSON configuration and via Hyperloop interface
+        \end{itemize}
+
+    \end{block}
+    \begin{block}{Process switches}
+        \begin{itemize}
+            \item Boolean configurable with a special purpose: enabling/disabling process functions
+            \item Can only be set via JSON or on Hyperloop
+        \end{itemize}
+
+    \end{block}
+    \begin{block}{Filters, Partitions}
+        \begin{itemize}
+            \item Selections on incoming data, that should be calculated upfront, before the task's code is entered
+            \item \programmatic{Filters} are automatically tied to all compatible inputs (for all process functions) and logically multiplied if needed
+            \item \programmatic{Partitions} are independent selections, that can be used via declared variable
+        \end{itemize}
+
+    \end{block}
+\end{frame}
+
+\begin{frame}[fragile]{Task ouputs}
+    \begin{block}{Histogram Registry}
+        \begin{itemize}
+            \item Efficient container for histogram objects (\texttt{TH1} descendants and \texttt{THnSparse})
+            \item Allows to declare histograms without creating them directly
+        \end{itemize}
+        \begin{minted}[fontsize=\small,breaklines]{cpp}
+HistogramRegistry registry{
+    "registry",
+    {
+        {"eta", "; #eta", {HistType::kTH1F, {{102, -2.01, 2.01}}}},
+        {"phi", "; #varphi", {HistType::kTH1F, {{100, 0., 2. * M_PI}}}}
+    }
+};
+        \end{minted}
+    \end{block}
+    \begin{block}{Output Object}
+        \begin{itemize}
+            \item Wrapper for generic \texttt{TObject} descendants
+        \end{itemize}
+\begin{minted}[fontsize=\small]{cpp}
+OutputObj<CorrelationContainer> same{"sameEvent"};
+OutputObj<CorrelationContainer> mixed{"mixedEvent"};
+\end{minted}
+    \end{block}
+\end{frame}
+\section{Summary}
+
+\begin{frame}{Summary}
+\begin{itemize}
+    \item At the current stage Analysis Framework contains wide set of basic tools to define arbitrary analysis
+    \item A number of declarative features is already implemented, leveraging advantages of the flattened data model and bulk processing
+    \item \enquote{Traditional} object-like interface is provided to iterate over tables
+    \item Work is ongoing to simplify syntax and extend functionality for all of the framework components (which requires more workforce)
+    \item \textcolor{DarkGoldenrod}{We need user feedback -- to learn what needs to be improved, or what features are needed the most, and, of course, what problems are there}
+\end{itemize}
+\end{frame}
+\end{document}

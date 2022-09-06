@@ -1,0 +1,285 @@
+% the various libraries we will be using
+\usepackage{tikz}
+\usetikzlibrary{plotmarks}
+\usetikzlibrary{intersections}
+\usetikzlibrary{positioning}
+\usetikzlibrary{bending}
+\usetikzlibrary{shapes.geometric}
+\usetikzlibrary{backgrounds}
+\usetikzlibrary{decorations.pathmorphing}
+\usetikzlibrary{arrows}
+\usetikzlibrary{arrows.meta}
+\usetikzlibrary{shapes}
+\usetikzlibrary{calc}
+\newcommand{\midarrow}{\tikz \draw[-triangle 60] (0,0) -- +(.1,0);}
+
+%\usepackage[none]{hyphenat}
+\usepackage{fontspec}
+\defaultfontfeatures{Ligatures=TeX}
+\setbeamertemplate{bibliography item}{\insertbiblabel}
+\setbeamertemplate{blocks}[rounded]
+
+\usepackage{hyperref}
+\usepackage{ragged2e}
+\usepackage{etoolbox}
+
+% define colours
+\definecolor{DarkBackground}{HTML}{B0231C}%{RGB}{21,43,57}
+\definecolor{Highlight}{HTML}{E1E1E1}%{RGB}{243, 255, 153}%{9,189,134}
+\definecolor{LightBackground}{HTML}{F1F1F1}%{FAFAFA}%{RGB}{239,238,236}
+\definecolor{DarkerOnLight}{HTML}{4E4946}%{RGB}{43,49,48}
+\definecolor{HighlightedOnLight}{HTML}{2C0E6E}
+\definecolor{URLColor}{RGB}{12,100,207}
+
+\hypersetup{
+	colorlinks,
+	allcolors=.,
+	urlcolor=URLColor,
+}
+
+
+%palette
+\setbeamercolor{palette primary}{fg=Highlight,bg=DarkBackground}
+\setbeamercolor{palette secondary}{fg=DarkerOnLight,bg=LightBackground}
+\setbeamercolor{palette tertiary}{fg=HighlightedOnLight,bg=LightBackground}
+\setbeamercolor{palette quaternary}{fg=DarkBackground,bg=Highlight}
+
+% set colours
+\setbeamercolor{normal text}{fg=DarkerOnLight,bg=LightBackground}%,fg=black,bg=LightBackground
+\setbeamercolor{titlelike}{parent=normal text,parent=palette tertiary}%,parent=palette secondary
+\setbeamercolor{itemize item}{parent=palette tertiary}
+\setbeamercolor{itemize subitem}{parent=palette tertiary}
+\setbeamercolor{enumerate item}{parent=palette tertiary}
+\setbeamercolor{alerted text}{parent=palette secondary,fg=red!60}
+\setbeamercolor{section in toc}{parent=palette secondary}
+\setbeamercolor{subsection is toc}{parent=palette secondary}
+\setbeamercolor{title}{parent=palette primary,fg=Highlight}
+\setbeamercolor{author}{parent=palette secondary}
+\setbeamercolor{subtitle}{parent=palette secondary}
+\setbeamercolor{institute}{parent=palette secondary}
+\setbeamercolor{date}{parent=palette tertiary}
+\setbeamercolor{frame title}{parent=palette primary}
+\setbeamercolor{section title}{parent=palette primary}
+\setbeamercolor{date in bar}{parent=palette primary}
+
+\setbeamercolor{block title}{parent=palette tertiary}%,bg=Highlight
+\setbeamercolor{block title alerted}{parent=alerted text}
+\setbeamercolor{block title example}{parent=example text}
+
+\setbeamercolor{block body}{parent=normal text,parent=palette secondary}%,parent=palette secondary
+\setbeamercolor{block body alerted}{parent=normal text,parent=block title alerted}
+\setbeamercolor{block body example}{parent=normal text,parent=block title example}
+\setbeamercolor{bibliography item}{parent=palette secondary}
+\setbeamercolor*{bibliography entry title}{parent=palette secondary}
+
+% set fonts
+\setbeamerfont{itemize/enumerate body}{size=\large}
+\setbeamerfont{itemize/enumerate subbody}{size=\normalsize}
+\setbeamerfont{itemize/enumerate subsubbody}{size=\small}
+
+\setbeamerfont{frame title}{series={\bfseries},size={\Huge},shape={}}
+\setbeamerfont{title}{size={\Huge},series={\bfseries}}%,shape={\scshape}
+\setbeamerfont{subtitle}{size={\normalsize},shape={}}
+\setbeamerfont{author}{size={\Large},shape={},series={\bfseries}}
+\setbeamerfont{on behalf}{size={\large},shape={},series={\bfseries}}
+\setbeamerfont{institute}{size={\large},shape={},series={\bfseries}}
+\setbeamerfont{date}{size={}}
+\setbeamerfont{section title}{size={\Huge},series={\bfseries},shape={\scshape}}
+\setbeamerfont{date in bar}{size={\scriptsize},series={\bfseries}}
+
+\setbeamerfont{block title}{size={\large},shape={},series={\bfseries}}
+\setbeamerfont{block body}{size={},series={},shape={}}
+
+%fix the itemize environment to use justified text
+\renewcommand{\itemize}[1][]{%
+	\beamer@ifempty{#1}{}{\def\beamer@defaultospec{#1}}%
+	\ifnum \@itemdepth >2\relax\@toodeep\else
+	\advance\@itemdepth\@ne
+	\beamer@computepref\@itemdepth% sets \beameritemnestingprefix
+	\usebeamerfont{itemize/enumerate \beameritemnestingprefix body}%
+	\usebeamercolor[fg]{itemize/enumerate \beameritemnestingprefix body}%
+	\usebeamertemplate{itemize/enumerate \beameritemnestingprefix body begin}%
+	\list
+	{\usebeamertemplate{itemize \beameritemnestingprefix item}}
+	{\def\makelabel##1{%
+			{%
+				\hss\llap{{%
+						\usebeamerfont*{itemize \beameritemnestingprefix item}%
+						\usebeamercolor[fg]{itemize \beameritemnestingprefix item}##1}}%
+			}%
+		}%
+	}
+	\fi%
+	\beamer@cramped%
+	\vskip -3pt
+	\RaggedRight% NEW
+	%\raggedright% ORIGINAL
+	\beamer@firstlineitemizeunskip%
+}
+
+\setbeamertemplate{itemize item}{\LEFTCIRCLE}
+% disable navigation
+\setbeamertemplate{navigation symbols}{}
+
+% we're drawing the title page ourselves, so blank out Beamer's implementation
+\setbeamertemplate{title page}{%
+	\begin{tikzpicture}
+		\useasboundingbox (0,0) rectangle(\the\paperwidth,\the\paperheight);
+		\fill[color=DarkBackground] (-5mm, 4cm) rectangle(\the\paperwidth,\the\paperheight);
+
+%		% draw the actual text
+		\node[anchor=south,text width=0.9\paperwidth,inner xsep=0.5cm] at (0.5\paperwidth,0.45\paperheight) {\usebeamercolor[fg]{title}{\usebeamerfont{title} \inserttitle}};
+		\node[anchor=north east,text width=0.9\paperwidth,align=right] at (0.48\paperwidth,0.4\paperheight) {\usebeamercolor[fg]{subtitle}{\usebeamerfont{subtitle} \insertsubtitle}};
+
+		\node[anchor=east] at (0.95\paperwidth,0.25\paperheight) {{\usebeamercolor[fg]{author}{\usebeamerfont{author} \insertauthor}}};
+%		% add the date in the corner
+		\node[anchor=south east] at(0.95\paperwidth,0cm) {\usebeamercolor[fg]{date} {\usebeamerfont{date} \insertdate}};
+	\end{tikzpicture}
+}
+% same thing with the frame titles
+\setbeamertemplate{frametitle}{%
+	\ifx\insertframetitle\empty%
+		\relax%
+	\else%
+		\begin{tikzpicture}
+			\useasboundingbox (0,0) rectangle(\the\paperwidth,1cm);%\the\paperheight);
+			\fill[color=DarkBackground] (-5mm, 0) rectangle(\the\paperwidth,0.15\paperheight);
+			\node[anchor=north,text width=0.98\paperwidth,inner xsep=0.5cm,inner ysep=0.25cm] at (0.5\paperwidth,1.12cm) {\usebeamercolor[fg]{frame title} {\usebeamerfont{frame title} \insertframetitle}};
+		\end{tikzpicture}%
+		\vspace*{-3pt}%
+	\fi%
+}
+
+%TOC
+\setbeamertemplate{section in toc}{%
+	{\usebeamercolor[fg]{section in toc}%
+		\bfseries\scshape\LARGE\inserttocsectionnumber.~\inserttocsection%
+	}%
+}%
+
+\setbeamertemplate{subsection in toc}{%
+	{\usebeamercolor[fg]{subsection in toc}%
+		\large\inserttocsubsectionnumber.~\inserttocsubsection\hspace{1.5em}%
+	}%
+}%
+
+
+% since I don't know a better way to do this, these are all switches
+% doing `\setcounter{showProgressBar}{0}` will turn the progress bar off (I turn it off for Appendix slides)
+% etc
+\newcounter{showProgressBar}
+\setcounter{showProgressBar}{1}
+\newcounter{showSlideNumbers}
+\setcounter{showSlideNumbers}{1}
+\newcounter{showSlideTotal}
+\setcounter{showSlideTotal}{1}
+
+% use \makeatletter for our progress bar definitions
+% progress bar idea from http://tex.stackexchange.com/a/59749/44221
+% slightly adapted for visual purposes here
+\makeatletter
+\newcount\progressbar@tmpcounta% auxiliary counter
+\newcount\progressbar@tmpcountb% auxiliary counter
+\newdimen\progressbar@pbwidth %progressbar width
+\newdimen\progressbar@tmpdim % auxiliary dimension
+
+% make the progress bar go across the screen
+\progressbar@pbwidth=\the\paperwidth
+
+% use tikz to draw everything
+% it may not be the best, but it's easy to work with
+% and looks good
+
+\setbeamertemplate{background}{
+%	% deal with progress bar stuff
+%	% (calculate where it should go)
+	\progressbar@tmpcounta=\insertframenumber
+	\progressbar@tmpcountb=\inserttotalframenumber
+	\progressbar@tmpdim=\progressbar@pbwidth
+	\multiply\progressbar@tmpdim by \progressbar@tmpcounta
+	\divide\progressbar@tmpdim by \progressbar@tmpcountb
+
+	\begin{tikzpicture}
+	% set up the entire slide as the canvas
+	\useasboundingbox (0,0) rectangle(\the\paperwidth,\the\paperheight);
+
+	% the background
+	\fill[color=LightBackground] (0,0) rectangle(\the\paperwidth,\the\paperheight);
+
+	% separate the drawing based on if we're the first (title) slide or not
+	\ifnum\thepage=1\relax
+	\else
+	% the the progress bar icon in the middle of the screen
+	\draw[fill=DarkBackground!70,draw=none] (0cm,0cm) rectangle(\the\paperwidth,0.25cm);
+	\draw[fill=DarkBackground,draw=none] (0cm,0cm) rectangle(\progressbar@tmpdim,0.25cm);
+	\node[anchor=east] at (\the\paperwidth,0.115cm) {\usebeamercolor[fg]{date in bar}{\usebeamerfont{date in bar} \insertshortauthor,~\insertshortdate }};%\insertshortauthor,~
+	\node[anchor=west] at (0cm,0.115cm) {\usebeamercolor[fg]{date in bar}{\usebeamerfont{date in bar} [\insertframenumber$/$\inserttotalframenumber] }};
+	\node at (0.5\paperwidth,0.115cm) {\usebeamercolor[fg]{date in bar}{\usebeamerfont{date in bar} \ifx\insertsectionhead\empty\relax\else[\insertsectionhead\ifx\empty\insertsubsectionhead\relax\else: \insertsubsectionhead\fi]\fi }}; %\insertsectionhead
+
+	\fi
+	\end{tikzpicture}
+}
+\makeatother
+
+%re-define block with neat tikz things
+\setbeamertemplate{block begin}
+{
+	\begin{beamercolorbox}[colsep*=.75ex]{block title}%,wd=0.7\textwidth
+		\ifx\insertblocktitle\empty%
+		\relax%
+		\else%
+		{%
+			\begin{tikzpicture}
+				\useasboundingbox (0,0) rectangle(1ex,1ex);
+				\draw[color=DarkBackground,thick] (0,0) -- (0,1.2em) -- (4em,1.2em);
+			\end{tikzpicture}%
+		}
+		\fi
+		{\usebeamerfont{block title}\insertblocktitle}%
+		\hfill%
+	\end{beamercolorbox}%
+	\ifx\insertblocktitle\empty%
+	\relax%
+	\else%
+	{\parskip0pt\par}%
+	\fi
+    \vspace{0.5ex}%
+	\ifbeamercolorempty[bg]{block title}
+	{}
+	{\ifbeamercolorempty[bg]{block body}{}{\nointerlineskip\vskip-0.5pt}}%
+	\usebeamerfont{block body}%
+	\begin{beamercolorbox}[colsep*=.75ex,vmode]{block body}%
+		\ifbeamercolorempty[bg]{block body}{\vskip-.25ex}{\vskip-.75ex}\vbox{}%
+		\centering
+		\begin{minipage}{0.96\textwidth}
+	    \justifying%
+}
+
+\setbeamertemplate{block end}
+{
+	\end{minipage}
+	\ifx\insertblocktitle\empty%
+	\relax%
+	\else%
+	{%
+		\vskip-2ex%
+		\begin{tikzpicture}
+		\useasboundingbox (\the\textwidth,0) rectangle (1ex,1ex);
+		\coordinate (rightside) at (current page.east);
+		\draw[color=DarkBackground,thick] (\the\textwidth-4em,-0.2em) -- (\the\textwidth-0,-0.2em) -- (\the\textwidth-0,1em);
+		\end{tikzpicture}%
+	}
+	\fi
+	\end{beamercolorbox}%
+	\vskip\medskipamount%
+}
+
+\setbeamersize{text margin left=0.4cm,text margin right=0.4cm}
+
+\addtobeamertemplate{block begin}{\vspace*{-3pt}}{}
+\addtobeamertemplate{block end}{}{\vspace*{-3pt}}
+\setbeamertemplate{frametitle continuation}[from second]
+
+\makeatletter
+\beamer@suppressreplacementstrue
+\makeatother

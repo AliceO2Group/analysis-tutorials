@@ -1,0 +1,39 @@
+\usetikzlibrary{positioning}
+\newcolumntype{x}{>{\columncolor{green!20}}c}
+\newcolumntype{y}{>{\columncolor{red!20}}c}
+\newcolumntype{z}{>{\columncolor{blue!20}}c}
+\newcolumntype{e}{>{\columncolor{teal!20}}c}
+\begin{tikzpicture}
+    \matrix[ampersand replacement=\&,column sep=-5pt] {
+        \node (tab)  {
+       	\renewcommand{\arraystretch}{1.5}
+		\begin{tabular}{c|x|x|z|y|e}
+			\rowcolor{LightBackground}
+			{} & \textbf{X} & \textbf{α}   & $\symbf{f(X,Z,m)}$ & \textbf{Index} & $\symbf{Z=X\sin \alpha}$ \\
+			\hline
+			1 & {}      & {}     & {}               & \colorbox{cyan!20}{2}    & {} \\
+			\hline
+			2 & {}     & {}      & {}               & \colorbox{green!20}{3}    & {} \\
+			\hline
+			{} & \multicolumn{2}{x|}{\large\programmatic{Static}} & {\large\programmatic{Dynamic}} & {\large\programmatic{Index}} & {\large\programmatic{Expression}} \\
+			{} & \multicolumn{2}{x|}{\texttt{Arrow::Array}} & {lambda function} & {\texttt{Arrow::Array}} & {\texttt{Arrow::Array}} \\
+			{} & \multicolumn{2}{x|}{\texttt{(type, type[N],}} & {not stored in memory} & {} & {created in memory} \\
+            {} & \multicolumn{2}{x|}{\texttt{vector<type>)}} & {calculated on demand} & {} & {with Gandiva}
+		\end{tabular}
+        }; \\
+        \node (tab2) {
+        	\begin{tabular}{c|c|c}
+        	{} & \textbf{A} & \textbf{B} \\
+        	\hline
+        	1 & {} & {} \\
+        	\hline
+        	\rowcolor{cyan!20}
+        	2 & {} & {} \\
+        	\hline
+        	\rowcolor{green!20}
+        	3 & {} & {}
+		\end{tabular}
+        };\\
+        \& \node {}; \\
+};
+\end{tikzpicture}

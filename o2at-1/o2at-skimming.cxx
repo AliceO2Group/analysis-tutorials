@@ -177,7 +177,6 @@ WorkflowSpec defineDataProcessing(ConfigContext const& cfgc)
   return WorkflowSpec{adaptAnalysisTask<ReadHFCandidates>(cfgc),
                       adaptAnalysisTask<ProduceDerivedTable>(cfgc),
                       adaptAnalysisTask<ProduceDerivedTableFilter>(cfgc),
+                      adaptAnalysisTask<ReadDerivedTable>(cfgc),
                       adaptAnalysisTask<ReadDerivedTable>(cfgc)};
-
-  // return WorkflowSpec{adaptAnalysisTask<ReadDerivedTable>(cfgc)};
 }

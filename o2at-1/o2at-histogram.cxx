@@ -23,13 +23,17 @@ using namespace o2;
 using namespace o2::framework;
 
 //STEP 1
-struct OutputObjects { //<- basic starting point, ask for addition of pT histogram
+//This showcases how to add simple histograms to get information about tracks.
+//It is meant to be executed unassisted, i.e. no extra workflows are necessary.
+//It subscribes only to the most simple tables.
+//Please keep in mind that for full analysis, further steps need to be taken!
+struct OutputObjects {
   // histogram created with OutputObj<TH1F>
   OutputObj<TH1F> phiHistogram1{TH1F("phiHistogram1", "phiHistogram1", 100, 0., 2. * M_PI)};
   OutputObj<TH1F> etaHistogram1{TH1F("etaHistogram1", "etaHistogram1", 200, -1., +1)};
   OutputObj<TH1F> ptHistogram1{TH1F("ptHistogram1", "ptHistogram1", 100, 0., 10.0)};
 
-  void process(aod::Tracks const& tracks)
+  void process(aod::TracksIU const& tracks)
   {
     for (auto& track : tracks) {
       phiHistogram1->Fill(track.phi());
@@ -40,6 +44,8 @@ struct OutputObjects { //<- basic starting point, ask for addition of pT histogr
 };
 
 //STEP 2
+//In this example, the user initialises the histograms using
+//the init function of the task struct. This is another alternative.
 struct OutputObjectsInit {
   // incomplete definition of an OutputObj
   OutputObj<TH1F> phiHistogram2{"phiHistogram2"};
@@ -54,7 +60,7 @@ struct OutputObjectsInit {
     ptHistogram2.setObject(new TH1F("ptHistogram2", "ptHistogram2", 100, 0., 10.0));
   }
 
-  void process(aod::Tracks const& tracks)
+  void process(aod::TracksIU const& tracks)
   {
     for (auto& track : tracks) {
       phiHistogram2->Fill(track.phi());
@@ -65,6 +71,10 @@ struct OutputObjectsInit {
 };
 
 //STEP 3
+//This further step adds 'configurables', which allow the user to
+//change the operating parameters of the task as desired and requred
+//without needing to actually change code for that. The configurables
+//can be set at runtime.
 struct OutputObjectsConfig {
   //Configurable for number of bins
   Configurable<int> nBinsPhi3{"nBinsPhi3", 100, "N bins in phi histo"}; //<- example of configurable
@@ -95,6 +105,12 @@ struct OutputObjectsConfig {
 };
 
 //STEP 4
+//The usage of the "HistogramRegistry" output class is
+//preferred versuys OutputObj, since the number of OutputObj slots
+//is typically limited but the HistogramRegistry is not really
+//limited and has full flexibility for storing histograms
+//(up to memory limitations, of course, which are relevant
+//in case very very large histograms are created!)
 struct OutputRegistry {
   //Configurable for number of bins
   Configurable<int> nBinsPhi4{"nBinsPhi4", 100, "N bins in phi histo"};
@@ -111,7 +127,7 @@ struct OutputRegistry {
     }
   };
 
-  void process(aod::Tracks const& tracks)
+  void process(aod::TracksIU const& tracks)
   {
     for (auto& track : tracks) {
       registry.get<TH1>(HIST("phiHistogram4"))->Fill(track.phi());
@@ -122,6 +138,13 @@ struct OutputRegistry {
 };
 
 //STEP 5
+//This example changes the input information from the simple TracksIU table
+//to additional information, such as collisions and extra track information.
+//By mentioning collisions before tracks, the framework also understands that
+//tracks should be grouped to appropriately indexed collisions: this means
+//that the proess function will be invoked once per collision, and each time
+//it is invoked, only the tracks indexed to that particular collision will be
+//made available.
 struct SubscriptionExample {
   //Configurable for number of bins
   Configurable<int> nBinsPhi5{"nBinsPhi5", 100, "N bins in phi histo"};
@@ -139,13 +162,14 @@ struct SubscriptionExample {
     }
   };
 
-  void process(aod::Collision const& collision, aod::Tracks const& tracks) //<- this is the main change
+  void process(aod::Collision const& collision, soa::Join<aod::TracksIU, aod::TracksExtra> const& tracks) //<- this is the main change
   {
     //Fill the event counter
     //check getter here: https://aliceo2group.github.io/analysis-framework/docs/datamodel/ao2dTables.html
     registry.get<TH1>(HIST("hVertexZ5"))->Fill(collision.posZ());
     //This will take place once per event!
     for (auto& track : tracks) {
+      if( track.tpcNClsCrossedRows() < 70 ) continue; //skip stuff not tracked well by TPC
       registry.get<TH1>(HIST("phiHistogram5"))->Fill(track.phi());
       registry.get<TH1>(HIST("etaHistogram5"))->Fill(track.eta());
       registry.get<TH1>(HIST("ptHistogram5"))->Fill(track.pt());
@@ -154,6 +178,14 @@ struct SubscriptionExample {
 };
 
 //STEP 6
+//This more sophisticated example exemplifies the access of MC information
+//to calculate a simple transverse momentum resolution histogram.
+//
+//N.B.: This is still a *simple* example, meaning no extra workflows are required.
+//Therefore, tracks are used at their innermost update (IU) and not closest to the
+//primary vertex. This will change slightly the momentum of low-momentum tracks
+//if material corrections are used. The usage of tracks propagated to the
+//primary vertex will be covered in a later tutorial. 
 struct MCAccessExample {
   //Configurable for number of bins
   Configurable<int> nBinsPhi6{"nBinsPhi6", 100, "N bins in phi histo"};
@@ -172,13 +204,14 @@ struct MCAccessExample {
     }
   };
 
-  void process(aod::Collision const& collision, soa::Join<aod::Tracks, aod::McTrackLabels> const& tracks, aod::McParticles const&) //<- this is the main change
+  void process(aod::Collision const& collision, soa::Join<aod::TracksIU, aod::TracksExtra, aod::McTrackLabels> const& tracks, aod::McParticles const&) //<- this is the main change
   {
     //Fill the event counter
     //check getter here: https://aliceo2group.github.io/analysis-framework/docs/datamodel/ao2dTables.html
     registry.get<TH1>(HIST("hVertexZ6"))->Fill(collision.posZ());
     //This will take place once per event!
     for (auto& track : tracks) {
+      if( track.tpcNClsCrossedRows() < 70 ) continue; //skip stuff not tracked well by TPC
       registry.get<TH1>(HIST("phiHistogram6"))->Fill(track.phi());
       registry.get<TH1>(HIST("etaHistogram6"))->Fill(track.eta());
       registry.get<TH1>(HIST("ptHistogram6"))->Fill(track.pt());
@@ -186,8 +219,8 @@ struct MCAccessExample {
       //Resolve MC track - no need to touch index!
       auto mcParticle = track.mcParticle_as<aod::McParticles>();
       
-      //Momentum resolution should always be done via pT/delta(1/pT)
-      float delta = 1./track.pt() - 1./mcParticle.pt();
+      //Very rough momentum resolution
+      float delta = track.pt() - mcParticle.pt();
       registry.get<TH2>(HIST("resoHistogram6"))->Fill(track.pt(), delta);
     }
   }

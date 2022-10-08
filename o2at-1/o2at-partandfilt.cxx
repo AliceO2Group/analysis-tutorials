@@ -25,10 +25,19 @@ using namespace o2::framework::expressions;
 
 
 //STEP 1
-//This is to make sure people know how to operate declarative programming well
-//It's a prerequisite for taking advantage of the speed offered by arrow
+//This is an example of a conveient declaration of "using"
+using TracksIUwithExtra = soa::Join<aod::TracksIU, aod::TracksExtra>;
+
+//This is a simple fitler example
+//Don't forget to add soa::Filtered in the subscription!
+//Otherwise, you'll get an error.
+//Careful with tpc crossed rows: one cannot filter on dynamic columns
+//Therefore, one has to write the expression to filter on by hand
+//When necessary, check the data model online:
+// https://aliceo2group.github.io/analysis-framework/docs/datamodel/ao2dTables.html
 struct FilterTrackExample {
   Filter etaFilter = nabs(aod::track::eta) < 0.5f;
+  Filter trackQuality = aod::track::tpcNClsFindable - aod::track::tpcNClsFindableMinusCrossedRows >= 70;
 
   //Configurable for number of bins
   Configurable<int> nBins1{"nBins1", 100, "N bins in all histos"};
@@ -44,7 +53,7 @@ struct FilterTrackExample {
     }
   };
 
-  void process(aod::Collision const& collision, soa::Filtered<aod::Tracks> const& tracks) //<- this is the main change
+  void process(aod::Collision const& collision, soa::Filtered<TracksIUwithExtra> const& tracks) //<- this is the main change
   {
     //Fill the event counter
     //check getter here: https://aliceo2group.github.io/analysis-framework/docs/datamodel/ao2dTables.html
@@ -58,6 +67,11 @@ struct FilterTrackExample {
   }
 };
 
+//STEP 2: partition
+//This is a plain partitioning example.
+//Note that the subscription to tracks is actually unchanged,
+//but the usage of a specific partition inside the process function can now be used.
+//This is all pretty similar to PYTHON list handling.
 struct PartitionTrackExample {
   Partition<o2::aod::Tracks> leftTracks = aod::track::eta < 0;
   Partition<o2::aod::Tracks> rightTracks = aod::track::eta >= 0;
@@ -80,7 +94,7 @@ struct PartitionTrackExample {
     }
   };
 
-  void process(aod::Collision const& collision, aod::Tracks const& tracks) //<- this is the main change
+  void process(aod::Collision const& collision, soa::Filtered<TracksIUwithExtra> const& tracks)
   {
     //Fill the event counter
     //check getter here: https://aliceo2group.github.io/analysis-framework/docs/datamodel/ao2dTables.html
@@ -99,10 +113,15 @@ struct PartitionTrackExample {
   }
 };
 
+//STEP 3: Partition and Filter simultaneously (and check results)
+//This is a logical combination of filtering and partitioning.
+//In practice, the partitions act on top of the already filtered data.
+//This example also provides specific histograms to inspect the outcome.
 struct PartitionAndFilterTrackExample {
   Partition<o2::aod::Tracks> leftTracks = aod::track::eta < 0;
   Partition<o2::aod::Tracks> rightTracks = aod::track::eta >= 0;
   Filter etaFilter = nabs(aod::track::eta) < 0.5f;
+  Filter trackQuality = aod::track::tpcNClsFindable - aod::track::tpcNClsFindableMinusCrossedRows >= 70;
 
   //Configurable for number of bins
   Configurable<int> nBins3{"nBins3", 100, "N bins in all histos"};
@@ -122,7 +141,7 @@ struct PartitionAndFilterTrackExample {
     }
   };
 
-  void process(aod::Collision const& collision, soa::Filtered<aod::Tracks> const& tracks) //<- this is the main change
+  void process(aod::Collision const& collision, soa::Filtered<TracksIUwithExtra> const& tracks)
   {
     //Fill the event counter
     //check getter here: https://aliceo2group.github.io/analysis-framework/docs/datamodel/ao2dTables.html
@@ -141,11 +160,16 @@ struct PartitionAndFilterTrackExample {
   }
 };
 
+//STEP 4: Use to write two-particle correlation
+//This is a simple two-particle correlation function filler
+//that makes use of both filters and partitions.
+//The core part of the 2pc filling still uses a nested loop.
 struct TwoParticleCorrelation {
   //Fully declarative!
   Partition<o2::aod::Tracks> triggerTracks = aod::track::pt > 2;
   Partition<o2::aod::Tracks> assocTracks = aod::track::pt < 2;
-  Filter etaFilter = nabs(aod::track::eta) < 0.8f;
+  Filter etaFilter = nabs(aod::track::eta) < 0.5f;
+  Filter trackQuality = aod::track::tpcNClsFindable - aod::track::tpcNClsFindableMinusCrossedRows >= 70;
 
   //Configurable for number of bins
   Configurable<int> nBins4{"nBins4", 100, "N bins in all histos"};
@@ -191,12 +215,11 @@ struct TwoParticleCorrelation {
     }
   };
 
-  void process(aod::Collision const& collision, soa::Filtered<aod::Tracks> const& tracks) //<- this is the main change
+  void process(aod::Collision const& collision, soa::Filtered<TracksIUwithExtra> const& tracks)
   {
     //Fill the event counter
     //check getter here: https://aliceo2group.github.io/analysis-framework/docs/datamodel/ao2dTables.html
     registry.get<TH1>(HIST("hVertexZ4"))->Fill(collision.posZ());
-    
     //Inspect the trigger and associated populations
     for (auto track : triggerTracks) { //<- only for a subset
       registry.get<TH1>(HIST("phiHistogramTrigger"))->Fill(track.phi());
@@ -208,7 +231,6 @@ struct TwoParticleCorrelation {
       registry.get<TH1>(HIST("etaHistogramAssoc"))->Fill(track.eta()); //<- this should show the selection
       registry.get<TH1>(HIST("ptHistogramAssoc"))->Fill(track.pt());
     }
-    
     //Now we do two-particle correlations, but still manually
     for (auto trackTrigger : triggerTracks) { //<- only for trgger
       for (auto trackAssoc : assocTracks) { //<- only for associated
@@ -220,15 +242,35 @@ struct TwoParticleCorrelation {
   }
 };
 
+//STEP 4: Use to write two-particle correlation but with combination
+//This is a simple two-particle correlation function filler
+//that makes use of both filters and partitions.
+//The core part of the 2pc filling now utilises a combination declaration
+//that is in principle more efficient.
 struct TwoParticleCorrelationCombination {
   //Fully declarative!
   Partition<o2::aod::Tracks> triggerTracks = aod::track::pt > 2;
   Partition<o2::aod::Tracks> assocTracks = aod::track::pt < 2;
-  Filter etaFilter = nabs(aod::track::eta) < 0.8f;
-
+  Filter etaFilter = nabs(aod::track::eta) < 0.5f;
+  Filter trackQuality = aod::track::tpcNClsFindable - aod::track::tpcNClsFindableMinusCrossedRows >= 70;
   //Configurable for number of bins
   Configurable<int> nBins5{"nBins5", 100, "N bins in all histos"};
-
+  // histogram defined with HistogramRegistry
+  HistogramRegistry registry{
+    "registry",
+    {
+      {"hVertexZ5", "hVertexZ5", {HistType::kTH1F, {{nBins5, -15., 15.}}}},
+      {"phiHistogramTrigger2", "phiHistogramTrigger2", {HistType::kTH1F, {{nBins5, 0., 2. * M_PI}}}},
+      {"etaHistogramTrigger2", "etaHistogramTrigger2", {HistType::kTH1F, {{nBins5, -1., +1}}}},
+      {"ptHistogramTrigger2", "ptHistogramTrigger2", {HistType::kTH1F, {{nBins5, 0., 10.0}}}},
+      {"phiHistogramAssoc2", "phiHistogramAssoc2", {HistType::kTH1F, {{nBins5, 0., 2. * M_PI}}}},
+      {"etaHistogramAssoc2", "etaHistogramAssoc2", {HistType::kTH1F, {{nBins5, -1., +1}}}},
+      {"ptHistogramAssoc2", "ptHistogramAssoc2", {HistType::kTH1F, {{nBins5, 0., 10.0}}}},
+      {"correlationFunction2", "correlationFunction2", {HistType::kTH2F, {{40, -1.6, 1.6}, {40,-0.5*M_PI, 1.5*M_PI}}}}
+      
+    }
+  };
+  
   Double_t ComputeDeltaPhi( Double_t phi1, Double_t phi2) {
       //To be completely sure, use inner products
       Double_t x1, y1, x2, y2;
@@ -253,24 +295,8 @@ struct TwoParticleCorrelationCombination {
       
       return lReturnVal;
   }
-  
-  // histogram defined with HistogramRegistry
-  HistogramRegistry registry{
-    "registry",
-    {
-      {"hVertexZ5", "hVertexZ5", {HistType::kTH1F, {{nBins5, -15., 15.}}}},
-      {"phiHistogramTrigger2", "phiHistogramTrigger2", {HistType::kTH1F, {{nBins5, 0., 2. * M_PI}}}},
-      {"etaHistogramTrigger2", "etaHistogramTrigger2", {HistType::kTH1F, {{nBins5, -1., +1}}}},
-      {"ptHistogramTrigger2", "ptHistogramTrigger2", {HistType::kTH1F, {{nBins5, 0., 10.0}}}},
-      {"phiHistogramAssoc2", "phiHistogramAssoc2", {HistType::kTH1F, {{nBins5, 0., 2. * M_PI}}}},
-      {"etaHistogramAssoc2", "etaHistogramAssoc2", {HistType::kTH1F, {{nBins5, -1., +1}}}},
-      {"ptHistogramAssoc2", "ptHistogramAssoc2", {HistType::kTH1F, {{nBins5, 0., 10.0}}}},
-      {"correlationFunction2", "correlationFunction2", {HistType::kTH2F, {{40, -1.6, 1.6}, {40,-0.5*M_PI, 1.5*M_PI}}}}
-      
-    }
-  };
 
-  void process(aod::Collision const& collision, soa::Filtered<aod::Tracks> const& tracks) //<- this is the main change
+  void process(aod::Collision const& collision, soa::Filtered<TracksIUwithExtra> const& tracks) //<- this is the main change
   {
     //Fill the event counter
     //check getter here: https://aliceo2group.github.io/analysis-framework/docs/datamodel/ao2dTables.html

@@ -26,7 +26,7 @@ using namespace o2::framework::expressions;
 
 //STEP 1
 //This is an example of a conveient declaration of "using"
-using TracksIUwithExtra = soa::Join<aod::TracksIU, aod::TracksExtra>;
+using MyCompleteTracks = soa::Join<aod::Tracks, aod::TracksExtra, aod::TracksDCA>;
 
 //This is a simple fitler example
 //Don't forget to add soa::Filtered in the subscription!
@@ -38,6 +38,7 @@ using TracksIUwithExtra = soa::Join<aod::TracksIU, aod::TracksExtra>;
 struct FilterTrackExample {
   Filter etaFilter = nabs(aod::track::eta) < 0.5f;
   Filter trackQuality = aod::track::tpcNClsFindable - aod::track::tpcNClsFindableMinusCrossedRows >= 70;
+  Filter trackDCA = nabs(aod::track::dcaXY) <= .2;
 
   //Configurable for number of bins
   Configurable<int> nBins1{"nBins1", 100, "N bins in all histos"};
@@ -53,7 +54,7 @@ struct FilterTrackExample {
     }
   };
 
-  void process(aod::Collision const& collision, soa::Filtered<TracksIUwithExtra> const& tracks) //<- this is the main change
+  void process(aod::Collision const& collision, soa::Filtered<MyCompleteTracks> const& tracks) //<- this is the main change
   {
     //Fill the event counter
     //check getter here: https://aliceo2group.github.io/analysis-framework/docs/datamodel/ao2dTables.html
@@ -94,7 +95,7 @@ struct PartitionTrackExample {
     }
   };
 
-  void process(aod::Collision const& collision, soa::Filtered<TracksIUwithExtra> const& tracks)
+  void process(aod::Collision const& collision, soa::Filtered<MyCompleteTracks> const& tracks)
   {
     //Fill the event counter
     //check getter here: https://aliceo2group.github.io/analysis-framework/docs/datamodel/ao2dTables.html
@@ -122,6 +123,7 @@ struct PartitionAndFilterTrackExample {
   Partition<o2::aod::Tracks> rightTracks = aod::track::eta >= 0;
   Filter etaFilter = nabs(aod::track::eta) < 0.5f;
   Filter trackQuality = aod::track::tpcNClsFindable - aod::track::tpcNClsFindableMinusCrossedRows >= 70;
+  Filter trackDCA = nabs(aod::track::dcaXY) <= .2;
 
   //Configurable for number of bins
   Configurable<int> nBins3{"nBins3", 100, "N bins in all histos"};
@@ -141,7 +143,7 @@ struct PartitionAndFilterTrackExample {
     }
   };
 
-  void process(aod::Collision const& collision, soa::Filtered<TracksIUwithExtra> const& tracks)
+  void process(aod::Collision const& collision, soa::Filtered<MyCompleteTracks> const& tracks)
   {
     //Fill the event counter
     //check getter here: https://aliceo2group.github.io/analysis-framework/docs/datamodel/ao2dTables.html
@@ -170,6 +172,7 @@ struct TwoParticleCorrelation {
   Partition<o2::aod::Tracks> assocTracks = aod::track::pt < 2;
   Filter etaFilter = nabs(aod::track::eta) < 0.5f;
   Filter trackQuality = aod::track::tpcNClsFindable - aod::track::tpcNClsFindableMinusCrossedRows >= 70;
+  Filter trackDCA = nabs(aod::track::dcaXY) <= .2;
 
   //Configurable for number of bins
   Configurable<int> nBins4{"nBins4", 100, "N bins in all histos"};
@@ -215,7 +218,7 @@ struct TwoParticleCorrelation {
     }
   };
 
-  void process(aod::Collision const& collision, soa::Filtered<TracksIUwithExtra> const& tracks)
+  void process(aod::Collision const& collision, soa::Filtered<MyCompleteTracks> const& tracks)
   {
     //Fill the event counter
     //check getter here: https://aliceo2group.github.io/analysis-framework/docs/datamodel/ao2dTables.html
@@ -253,6 +256,7 @@ struct TwoParticleCorrelationCombination {
   Partition<o2::aod::Tracks> assocTracks = aod::track::pt < 2;
   Filter etaFilter = nabs(aod::track::eta) < 0.5f;
   Filter trackQuality = aod::track::tpcNClsFindable - aod::track::tpcNClsFindableMinusCrossedRows >= 70;
+  Filter trackDCA = nabs(aod::track::dcaXY) <= .2;
   //Configurable for number of bins
   Configurable<int> nBins5{"nBins5", 100, "N bins in all histos"};
   // histogram defined with HistogramRegistry
@@ -296,7 +300,7 @@ struct TwoParticleCorrelationCombination {
       return lReturnVal;
   }
 
-  void process(aod::Collision const& collision, soa::Filtered<TracksIUwithExtra> const& tracks) //<- this is the main change
+  void process(aod::Collision const& collision, soa::Filtered<MyCompleteTracks> const& tracks) //<- this is the main change
   {
     //Fill the event counter
     //check getter here: https://aliceo2group.github.io/analysis-framework/docs/datamodel/ao2dTables.html

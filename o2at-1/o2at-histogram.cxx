@@ -94,7 +94,7 @@ struct OutputObjectsConfig {
     ptHistogram3.setObject(new TH1F("ptHistogram3", "ptHistogram3", nBinsPt3, 0., 10.0));
   }
 
-  void process(aod::Tracks const& tracks)
+  void process(aod::TracksIU const& tracks)
   {
     for (auto& track : tracks) {
       phiHistogram3->Fill(track.phi());
@@ -178,6 +178,43 @@ struct SubscriptionExample {
 };
 
 //STEP 6
+//This example now adds a DCA cut and subscribes to the different Tracks (not IU) table.
+//This is the very first instance of helper tasks being required by the user!
+//made available.
+struct HelperExample {
+  //Configurable for number of bins
+  Configurable<int> nBinsPhi5{"nBinsPhi5", 100, "N bins in phi histo"};
+  Configurable<int> nBinsEta5{"nBinsEta5", 100, "N bins in eta histo"};
+  Configurable<int> nBinsPt5{"nBinsPt5", 100, "N bins in pT histo"};
+
+  // histogram defined with HistogramRegistry
+  HistogramRegistry registry{
+    "registry",
+    {
+      {"hVertexZ5", "hVertexZ5", {HistType::kTH1F, {{120, -15., 15.}}}},
+      {"phiHistogram5", "phiHistogram5", {HistType::kTH1F, {{nBinsPhi5, 0., 2. * M_PI}}}},
+      {"etaHistogram5", "etaHistogram5", {HistType::kTH1F, {{nBinsEta5, -1., +1}}}},
+      {"ptHistogram5", "ptHistogram5", {HistType::kTH1F, {{nBinsPt5, 0., 10.0}}}}
+    }
+  };
+
+  void process(aod::Collision const& collision, soa::Join<aod::Tracks, aod::TracksExtra, aod::TracksDCA> const& tracks) //<- this is the main change
+  {
+    //Fill the event counter
+    //check getter here: https://aliceo2group.github.io/analysis-framework/docs/datamodel/ao2dTables.html
+    registry.get<TH1>(HIST("hVertexZ5"))->Fill(collision.posZ());
+    //This will take place once per event!
+    for (auto& track : tracks) {
+      if( track.tpcNClsCrossedRows() < 70 ) continue; //skip stuff not tracked well by TPC
+      if( fabs(track.dcaXY()) > .2 ) continue; //skip stuff that doesn't point to PV (example, can be elaborate!)
+      registry.get<TH1>(HIST("phiHistogram5"))->Fill(track.phi());
+      registry.get<TH1>(HIST("etaHistogram5"))->Fill(track.eta());
+      registry.get<TH1>(HIST("ptHistogram5"))->Fill(track.pt());
+    }
+  }
+};
+
+//STEP 7
 //This more sophisticated example exemplifies the access of MC information
 //to calculate a simple transverse momentum resolution histogram.
 //
@@ -188,40 +225,41 @@ struct SubscriptionExample {
 //primary vertex will be covered in a later tutorial. 
 struct MCAccessExample {
   //Configurable for number of bins
-  Configurable<int> nBinsPhi6{"nBinsPhi6", 100, "N bins in phi histo"};
-  Configurable<int> nBinsEta6{"nBinsEta6", 100, "N bins in eta histo"};
-  Configurable<int> nBinsPt6{"nBinsPt6", 100, "N bins in pT histo"};
+  Configurable<int> nBinsPhi7{"nBinsPhi7", 100, "N bins in phi histo"};
+  Configurable<int> nBinsEta7{"nBinsEta7", 100, "N bins in eta histo"};
+  Configurable<int> nBinsPt7{"nBinsPt7", 100, "N bins in pT histo"};
 
   // histogram defined with HistogramRegistry
   HistogramRegistry registry{
     "registry",
     {
-      {"hVertexZ6", "hVertexZ6", {HistType::kTH1F, {{120, -15., 15.}}}},
-      {"phiHistogram6", "phiHistogram6", {HistType::kTH1F, {{nBinsPhi6, 0., 2. * M_PI}}}},
-      {"etaHistogram6", "etaHistogram6", {HistType::kTH1F, {{nBinsEta6, -1., +1}}}},
-      {"ptHistogram6", "ptHistogram6", {HistType::kTH1F, {{nBinsPt6, 0., 10.0}}}},
-      {"resoHistogram6", "resoHistogram6", {HistType::kTH2F, {{nBinsPt6, 0., 10.0}, {100, -10.0, 10.0}}}}
+      {"hVertexZ7", "hVertexZ7", {HistType::kTH1F, {{120, -15., 15.}}}},
+      {"phiHistogram7", "phiHistogram7", {HistType::kTH1F, {{nBinsPhi6, 0., 2. * M_PI}}}},
+      {"etaHistogram7", "etaHistogram7", {HistType::kTH1F, {{nBinsEta6, -1., +1}}}},
+      {"ptHistogram7", "ptHistogram7", {HistType::kTH1F, {{nBinsPt6, 0., 10.0}}}},
+      {"resoHistogram7", "resoHistogram7", {HistType::kTH2F, {{nBinsPt6, 0., 10.0}, {100, -10.0, 10.0}}}}
     }
   };
 
-  void process(aod::Collision const& collision, soa::Join<aod::TracksIU, aod::TracksExtra, aod::McTrackLabels> const& tracks, aod::McParticles const&) //<- this is the main change
+  void process(aod::Collision const& collision, soa::Join<aod::Tracks, aod::TracksExtra, aod::TracksDCA, aod::McTrackLabels> const& tracks, aod::McParticles const&) //<- this is the main change
   {
     //Fill the event counter
     //check getter here: https://aliceo2group.github.io/analysis-framework/docs/datamodel/ao2dTables.html
-    registry.get<TH1>(HIST("hVertexZ6"))->Fill(collision.posZ());
+    registry.get<TH1>(HIST("hVertexZ7"))->Fill(collision.posZ());
     //This will take place once per event!
     for (auto& track : tracks) {
       if( track.tpcNClsCrossedRows() < 70 ) continue; //skip stuff not tracked well by TPC
-      registry.get<TH1>(HIST("phiHistogram6"))->Fill(track.phi());
-      registry.get<TH1>(HIST("etaHistogram6"))->Fill(track.eta());
-      registry.get<TH1>(HIST("ptHistogram6"))->Fill(track.pt());
+      if( fabs(track.dcaXY()) > .2 ) continue; //skip stuff that doesn't point to PV (example, can be elaborate!)
+      registry.get<TH1>(HIST("phiHistogram7"))->Fill(track.phi());
+      registry.get<TH1>(HIST("etaHistogram7"))->Fill(track.eta());
+      registry.get<TH1>(HIST("ptHistogram7"))->Fill(track.pt());
       
       //Resolve MC track - no need to touch index!
       auto mcParticle = track.mcParticle_as<aod::McParticles>();
       
       //Very rough momentum resolution
       float delta = track.pt() - mcParticle.pt();
-      registry.get<TH2>(HIST("resoHistogram6"))->Fill(track.pt(), delta);
+      registry.get<TH2>(HIST("resoHistogram7"))->Fill(track.pt(), delta);
     }
   }
 };

@@ -24,8 +24,9 @@ using namespace o2;
 using namespace o2::framework;
 using namespace o2::framework::expressions;
 
-//STEP 4
-//Now adding two process functions
+//STEP 5
+//Use MC label of V0s to fill pid histograms 
+//based on MC true information
 using MyTracksRun2 = soa::Join<aod::Tracks, aod::TracksExtra, aod::TracksCov, aod::TracksDCA, aod::pidTPCPi, aod::pidTPCPr>;
 using MyTracksRun3 = soa::Join<aod::TracksIU, aod::TracksExtra, aod::TracksCovIU, aod::TracksDCA, aod::pidTPCPi, aod::pidTPCPr>;
 using LabeledV0s = soa::Join<aod::V0Datas, aod::McV0Labels>;
@@ -48,6 +49,7 @@ struct vzeromcexample {
   HistogramRegistry registry{
     "registry",
     {
+      {"hVertexZ", "hVertexZ", {HistType::kTH1F, {{nBins, -15., 15.}}}},
       {"hMassK0Short", "hMassK0Short", {HistType::kTH1F, {{200, 0.450f, 0.550f}}}},
       {"hMassLambda", "hMassLambda", {HistType::kTH1F, {{200, 1.015f, 1.215f}}}},
       {"hMassAntiLambda", "hMassAntiLambda", {HistType::kTH1F, {{200, 1.015f, 1.215f}}}},
@@ -90,7 +92,8 @@ struct vzeromcexample {
       
     }
   }
-    
+  
+  //define first process function, used to process Run2 data
   void processRun2(soa::Join<aod::Collisions, aod::EvSels>::iterator const& collision, soa::Filtered<LabeledV0s> const& V0s, MyTracksRun2 const& tracks)
   {
     //Basic event selection (all helper tasks are now included!)
@@ -105,6 +108,7 @@ struct vzeromcexample {
   }
   PROCESS_SWITCH(vzeromcexample, processRun2, "Process Run 2 data", false);
 
+  //define first process function, used to process Run3 data
   void processRun3(soa::Join<aod::Collisions, aod::EvSels>::iterator const& collision, soa::Filtered<LabeledV0s> const& V0s, MyTracksRun3 const& tracks)
   {
     //Basic event selection (all helper tasks are now included!)

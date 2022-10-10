@@ -25,7 +25,8 @@ using namespace o2::framework;
 using namespace o2::framework::expressions;
 
 //STEP 3
-//now adding particle identification 
+//Now adding particle identification 
+//by using the tpcNSigma track variable 
 using MyTracks = soa::Join<aod::Tracks, aod::TracksExtra, aod::pidTPCPi, aod::pidTPCPr>;
 
 struct vzeropidexample {
@@ -46,6 +47,7 @@ struct vzeropidexample {
   HistogramRegistry registry{
     "registry",
     {
+      {"hVertexZ", "hVertexZ", {HistType::kTH1F, {{nBins, -15., 15.}}}},
       {"hMassK0Short", "hMassK0Short", {HistType::kTH1F, {{200, 0.450f, 0.550f}}}},
       {"hMassLambda", "hMassLambda", {HistType::kTH1F, {{200, 1.015f, 1.215f}}}},
       {"hMassAntiLambda", "hMassAntiLambda", {HistType::kTH1F, {{200, 1.015f, 1.215f}}}}

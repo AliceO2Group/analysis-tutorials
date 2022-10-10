@@ -10,9 +10,8 @@
 // or submit itself to any jurisdiction.
 ///
 /// \brief This task contains the individual steps that are to be taken
-///        in the first part of the tutorial. These are 6 steps, and at the end,
-///        the participant is expected to have a pT resolution histogram
-///        as a function of transverse momentum.
+///        in the second part of the tutorial. These are 5 steps, and at the end,
+///        the participant is expected to have a two-particle correlation spectrum.
 /// \author
 /// \since
 
@@ -24,16 +23,13 @@ using namespace o2;
 using namespace o2::framework;
 using namespace o2::framework::expressions;
 
-
-//STEP 1
 //This is an example of a conveient declaration of "using"
 using MyCompleteTracks = soa::Join<aod::Tracks, aod::TracksExtra, aod::TracksDCA>;
 
-//STEP 5: Use to write two-particle correlation but with combination
+//STEP 4: Use to write two-particle correlation using for loops
 //This is a simple two-particle correlation function filler
 //that makes use of both filters and partitions.
-//The core part of the 2pc filling now utilises a combination declaration
-//that is in principle more efficient.
+//The core part of the 2pc filling utilises two for loops.
 struct twoparcorexample {
   //Fully declarative!
   Partition<o2::aod::Tracks> triggerTracks = aod::track::pt > 2;
@@ -99,7 +95,7 @@ struct twoparcorexample {
     }
     
     //Now we do two-particle correlations, but still manually
-    for (auto trackTrigger : triggerTracks) { //<- only for trgger
+    for (auto trackTrigger : triggerTracks) { //<- only for trigger
       for (auto trackAssoc : assocTracks) { //<- only for associated
         registry.get<TH2>(HIST("correlationFunction"))->Fill(
                                                              trackTrigger.eta()-trackAssoc.eta(),

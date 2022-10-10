@@ -10,9 +10,8 @@
 // or submit itself to any jurisdiction.
 ///
 /// \brief This task contains the individual steps that are to be taken
-///        in the first part of the tutorial. These are 6 steps, and at the end,
-///        the participant is expected to have a pT resolution histogram
-///        as a function of transverse momentum.
+///        in the second part of the tutorial. These are 5 steps, and at the end,
+///        the participant is expected to have a two-particle correlation spectrum.
 /// \author
 /// \since
 

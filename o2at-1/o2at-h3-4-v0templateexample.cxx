@@ -47,6 +47,7 @@ struct vzerotemplateexample {
   HistogramRegistry registry{
     "registry",
     {
+      {"hVertexZ", "hVertexZ", {HistType::kTH1F, {{nBins, -15., 15.}}}},
       {"hMassK0Short", "hMassK0Short", {HistType::kTH1F, {{200, 0.450f, 0.550f}}}},
       {"hMassLambda", "hMassLambda", {HistType::kTH1F, {{200, 1.015f, 1.215f}}}},
       {"hMassAntiLambda", "hMassAntiLambda", {HistType::kTH1F, {{200, 1.015f, 1.215f}}}}
@@ -77,7 +78,8 @@ struct vzerotemplateexample {
       }
     }
   }
-    
+
+  //define first process function, used to process Run2 data
   void processRun2(soa::Join<aod::Collisions, aod::EvSels>::iterator const& collision, soa::Filtered<aod::V0Datas> const& V0s, MyTracksRun2 const& tracks)
   {
     //Basic event selection (all helper tasks are now included!)
@@ -92,6 +94,7 @@ struct vzerotemplateexample {
   }
   PROCESS_SWITCH(vzerotemplateexample, processRun2, "Process Run 2 data", false);
 
+  //define second process function, used to process Run3 data
   void processRun3(soa::Join<aod::Collisions, aod::EvSels>::iterator const& collision, soa::Filtered<aod::V0Datas> const& V0s, MyTracksRun3 const& tracks)
   {
     //Basic event selection (all helper tasks are now included!)

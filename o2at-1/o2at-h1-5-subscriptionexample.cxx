@@ -27,7 +27,7 @@ using namespace o2::framework;
 //to additional information, such as collisions and extra track information.
 //By mentioning collisions before tracks, the framework also understands that
 //tracks should be grouped to appropriately indexed collisions: this means
-//that the proess function will be invoked once per collision, and each time
+//that the process function will be invoked once per collision, and each time
 //it is invoked, only the tracks indexed to that particular collision will be
 //made available.
 struct subscriptionexample {

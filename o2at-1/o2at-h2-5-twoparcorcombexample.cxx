@@ -10,9 +10,8 @@
 // or submit itself to any jurisdiction.
 ///
 /// \brief This task contains the individual steps that are to be taken
-///        in the first part of the tutorial. These are 6 steps, and at the end,
-///        the participant is expected to have a pT resolution histogram
-///        as a function of transverse momentum.
+///        in the second part of the tutorial. These are 5 steps, and at the end,
+///        the participant is expected to have a two-particle correlation spectrum.
 /// \author
 /// \since
 
@@ -24,8 +23,6 @@ using namespace o2;
 using namespace o2::framework;
 using namespace o2::framework::expressions;
 
-
-//STEP 1
 //This is an example of a conveient declaration of "using"
 using MyCompleteTracks = soa::Join<aod::Tracks, aod::TracksExtra, aod::TracksDCA>;
 
@@ -82,11 +79,11 @@ struct twoparcorcombexample {
       return lReturnVal;
   }
 
-  void process(aod::Collision const& collision, soa::Filtered<MyCompleteTracks> const& tracks) //<- this is the main change
+  void process(aod::Collision const& collision, soa::Filtered<MyCompleteTracks> const& tracks) 
   {
     //Fill the event counter
     //check getter here: https://aliceo2group.github.io/analysis-framework/docs/datamodel/ao2dTables.html
-    registry.get<TH1>(HIST("hVertexZ5"))->Fill(collision.posZ());
+    registry.get<TH1>(HIST("hVertexZ"))->Fill(collision.posZ());
     
     //Inspect the trigger and associated populations
     for (auto track : triggerTracks) { //<- only for a subset
@@ -98,8 +95,8 @@ struct twoparcorcombexample {
       registry.get<TH1>(HIST("ptHistogramAssoc"))->Fill(track.pt());
     }
     
-    //Now we do two-particle correlations, but still manually
-    for (auto& [trackTrigger, trackAssoc] : combinations(triggerTracks, assocTracks)) {
+    //Now we do two-particle correlations, using "combinations"
+    for (auto& [trackTrigger, trackAssoc] : combinations(triggerTracks, assocTracks)) {  //<- this is the main change
         registry.get<TH2>(HIST("correlationFunction"))->Fill(
                                                              trackTrigger.eta()-trackAssoc.eta(),
                                                              ComputeDeltaPhi(trackTrigger.phi(), trackAssoc.phi() ));

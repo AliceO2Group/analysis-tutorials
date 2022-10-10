@@ -24,7 +24,7 @@ using namespace o2::framework;
 
 //STEP 4
 //The usage of the "HistogramRegistry" output class is
-//preferred versuys OutputObj, since the number of OutputObj slots
+//preferred versus OutputObj, since the number of OutputObj slots
 //is typically limited but the HistogramRegistry is not really
 //limited and has full flexibility for storing histograms
 //(up to memory limitations, of course, which are relevant
@@ -46,7 +46,6 @@ struct histogramregistry {
   void process(aod::TracksIU const& tracks)
   {
     for (auto& track : tracks) {
-      registry.get<TH1>(HIST("phiHistogram"))->Fill(track.phi());
       registry.get<TH1>(HIST("etaHistogram"))->Fill(track.eta());
       registry.get<TH1>(HIST("ptHistogram"))->Fill(track.pt());
     }

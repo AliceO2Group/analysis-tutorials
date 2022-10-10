@@ -36,6 +36,7 @@ struct vzeroexample {
   HistogramRegistry registry{
     "registry",
     {
+      {"hVertexZ", "hVertexZ", {HistType::kTH1F, {{nBins, -15., 15.}}}},
       {"hMassK0Short", "hMassK0Short", {HistType::kTH1F, {{200, 0.450f, 0.550f}}}}
     }
   };

@@ -94,7 +94,8 @@ struct ProduceDerivedTable { //<- workflow that loops over HF 2-prong
       // check first if the HF 2-prong candidate is tagged as a D0
       bool isD0Sel = TESTBIT(cand.hfflag(), aod::hf_cand_prong2::DecayType::D0ToPiK);
 
-      if (!isD0Sel) {
+      // let's select only D0 andidates with pT > 4 GeV/c
+      if (!isD0Sel || cand.pt() < 4.) {
         continue;
       }
 
@@ -115,41 +116,6 @@ struct ProduceDerivedTable { //<- workflow that loops over HF 2-prong
 };
 
 // STEP 4
-struct ProduceDerivedTableFilter { //<- workflow that loops over HF 2-prong
-                                   // candidates and fills a derived table after applying a filter on pt
-
-  Produces<aod::MyTable> tableWithDzeroCandidates;
-  Filter ptFilter = std::sqrt(aod::hf_cand_prong2::px * aod::hf_cand_prong2::px + aod::hf_cand_prong2::py * aod::hf_cand_prong2::py) > 4.;
-
-  void process(soa::Filtered<aod::HfCandProng2> const& cand2Prongs, aod::Tracks const&)
-  {
-    // loop over 2-prong candidates
-    for (auto& cand : cand2Prongs) {
-
-      // check first if the HF 2-prong candidate is tagged as a D0
-      bool isD0Sel = TESTBIT(cand.hfflag(), aod::hf_cand_prong2::DecayType::D0ToPiK);
-
-      if (!isD0Sel) {
-        continue;
-      }
-
-      auto invMassD0 = InvMassD0(cand);
-      auto invMassD0bar = InvMassD0bar(cand);
-
-      LOG(debug) << "Candidate with mass(D0) = " << invMassD0
-                 << ", mass(D0bar) = " << invMassD0bar
-                 << ", pt = " << cand.pt()
-                 << ", cos(theta_P) = " << cand.cpa();
-
-      // we retrieve also the collision index from one of the daughters
-      auto dauTrack = cand.index0_as<aod::Tracks>(); // positive daughter
-
-      tableWithDzeroCandidates(invMassD0, invMassD0bar, cand.pt(), cand.cpa(), dauTrack.collisionId());
-    }
-  }
-};
-
-// STEP 5
 struct ReadDerivedTable { //<- workflow that reads derived table and fill
                           // histograms
 
@@ -176,7 +142,5 @@ WorkflowSpec defineDataProcessing(ConfigContext const& cfgc)
 {
   return WorkflowSpec{adaptAnalysisTask<ReadHFCandidates>(cfgc),
                       adaptAnalysisTask<ProduceDerivedTable>(cfgc),
-                      adaptAnalysisTask<ProduceDerivedTableFilter>(cfgc),
-                      adaptAnalysisTask<ReadDerivedTable>(cfgc),
                       adaptAnalysisTask<ReadDerivedTable>(cfgc)};
 }

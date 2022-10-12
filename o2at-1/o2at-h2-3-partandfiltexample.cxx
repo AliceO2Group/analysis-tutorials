@@ -18,6 +18,7 @@
 #include "Framework/runDataProcessing.h"
 #include "Framework/AnalysisTask.h"
 #include "Common/DataModel/TrackSelectionTables.h"
+#include "Framework/ASoAHelpers.h"
 
 using namespace o2;
 using namespace o2::framework;
@@ -31,11 +32,14 @@ using MyCompleteTracks = soa::Join<aod::Tracks, aod::TracksExtra, aod::TracksDCA
 //In practice, the partitions act on top of the already filtered data.
 //This example also provides specific histograms to inspect the outcome.
 struct partandfiltexample {
-  Partition<MyCompleteTracks> leftTracks = aod::track::eta < 0.0f;
-  Partition<MyCompleteTracks> rightTracks = aod::track::eta >= 0.0f;
+  // all defined filters are applied
   Filter etaFilter = nabs(aod::track::eta) < 0.5f;
   Filter trackDCA = nabs(aod::track::dcaXY) < 0.2f;
+  using MyFilteredTracks = soa::Filtered<MyCompleteTracks>;
 
+  Partition<MyFilteredTracks> leftTracks = aod::track::eta < 0.0f;
+  Partition<MyFilteredTracks> rightTracks = aod::track::eta >= 0.0f;
+  
   //Configurable for number of bins
   Configurable<int> nBins{"nBins", 100, "N bins in all histos"};
 
@@ -52,7 +56,7 @@ struct partandfiltexample {
     }
   };
 
-  void process(aod::Collision const& collision, soa::Filtered<MyCompleteTracks> const& tracks)
+  void process(aod::Collision const& collision, MyFilteredTracks const& tracks)
   {
     //Fill the event counter
     //check getter here: https://aliceo2group.github.io/analysis-framework/docs/datamodel/ao2dTables.html

@@ -18,6 +18,7 @@
 #include "Framework/runDataProcessing.h"
 #include "Framework/AnalysisTask.h"
 #include "Common/DataModel/TrackSelectionTables.h"
+#include "Framework/ASoAHelpers.h"
 
 using namespace o2;
 using namespace o2::framework;
@@ -31,11 +32,13 @@ using MyCompleteTracks = soa::Join<aod::Tracks, aod::TracksExtra, aod::TracksDCA
 //that makes use of both filters and partitions.
 //The core part of the 2pc filling utilises two for loops.
 struct twoparcorexample {
-  //Fully declarative!
-  Partition<MyCompleteTracks> triggerTracks = aod::track::pt > 2.0f;
-  Partition<MyCompleteTracks> assocTracks = aod::track::pt < 2.0f;
+  // all defined filters are applied
   Filter etaFilter = nabs(aod::track::eta) < 0.5f;
   Filter trackDCA = nabs(aod::track::dcaXY) < 0.2f;
+  using MyFilteredTracks = soa::Filtered<MyCompleteTracks>;
+
+  Partition<MyFilteredTracks> leftTracks = aod::track::eta < 0.0f;
+  Partition<MyFilteredTracks> rightTracks = aod::track::eta >= 0.0f;
   //Configurable for number of bins
   Configurable<int> nBins{"nBins", 100, "N bins in all histos"};
   // histogram defined with HistogramRegistry
@@ -47,7 +50,7 @@ struct twoparcorexample {
       {"ptHistogramTrigger", "ptHistogramTrigger", {HistType::kTH1F, {{nBins, 0., 10.0}}}},
       {"etaHistogramAssoc", "etaHistogramAssoc", {HistType::kTH1F, {{nBins, -1., +1}}}},
       {"ptHistogramAssoc", "ptHistogramAssoc", {HistType::kTH1F, {{nBins, 0., 10.0}}}},
-      {"correlationFunction", "correlationFunction", {HistType::kTH2F, {{40, -1.6, 1.6}, {40,-0.5*M_PI, 1.5*M_PI}}}}
+      {"correlationFunction", "correlationFunction", {HistType::kTH1F, {{40,-0.5*M_PI, 1.5*M_PI}}}}
       
     }
   };
@@ -77,7 +80,7 @@ struct twoparcorexample {
       return lReturnVal;
   }
 
-  void process(aod::Collision const& collision, soa::Filtered<MyCompleteTracks> const& tracks) //<- this is the main change
+  void process(aod::Collision const& collision, MyFilteredTracks const& tracks) //<- this is the main change
   {
     //Fill the event counter
     //check getter here: https://aliceo2group.github.io/analysis-framework/docs/datamodel/ao2dTables.html
@@ -100,9 +103,7 @@ struct twoparcorexample {
       if(trackTrigger.tpcNClsCrossedRows() < 70 ) continue; //can't filter on dynamic
       for (auto trackAssoc : assocTracks) { //<- only for associated
         if(trackAssoc.tpcNClsCrossedRows() < 70 ) continue; //can't filter on dynamic
-        registry.get<TH2>(HIST("correlationFunction"))->Fill(
-                                                             trackTrigger.eta()-trackAssoc.eta(),
-                                                             ComputeDeltaPhi(trackTrigger.phi(), trackAssoc.phi() ));
+        registry.get<TH1>(HIST("correlationFunction"))->Fill(ComputeDeltaPhi(trackTrigger.phi(), trackAssoc.phi() ));
       }
     }
   }

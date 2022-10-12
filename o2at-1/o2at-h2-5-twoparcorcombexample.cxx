@@ -18,6 +18,7 @@
 #include "Framework/runDataProcessing.h"
 #include "Framework/AnalysisTask.h"
 #include "Common/DataModel/TrackSelectionTables.h"
+#include "Framework/ASoAHelpers.h"
 
 using namespace o2;
 using namespace o2::framework;
@@ -33,11 +34,10 @@ using MyCompleteTracks = soa::Join<aod::Tracks, aod::TracksExtra, aod::TracksDCA
 //that is in principle more efficient.
 struct twoparcorcombexample {
   //Fully declarative!
-  Partition<o2::aod::Tracks> triggerTracks = aod::track::pt > 2;
-  Partition<o2::aod::Tracks> assocTracks = aod::track::pt < 2;
+  Partition<MyCompleteTracks> triggerTracks = aod::track::pt > 2.0f;
+  Partition<MyCompleteTracks> assocTracks = aod::track::pt < 2.0f;
   Filter etaFilter = nabs(aod::track::eta) < 0.5f;
-  Filter trackQuality = aod::track::tpcNClsFindable - aod::track::tpcNClsFindableMinusCrossedRows >= 70;
-  Filter trackDCA = nabs(aod::track::dcaXY) <= .2;
+  Filter trackDCA = nabs(aod::track::dcaXY) < 0.2f;
   //Configurable for number of bins
   Configurable<int> nBins{"nBins", 100, "N bins in all histos"};
   // histogram defined with HistogramRegistry
@@ -86,20 +86,22 @@ struct twoparcorcombexample {
     registry.get<TH1>(HIST("hVertexZ"))->Fill(collision.posZ());
     
     //Inspect the trigger and associated populations
-    for (auto track : triggerTracks) { //<- only for a subset
+    for (auto& track : triggerTracks) { //<- only for a subset
       registry.get<TH1>(HIST("etaHistogramTrigger"))->Fill(track.eta()); //<- this should show the selection
       registry.get<TH1>(HIST("ptHistogramTrigger"))->Fill(track.pt());
     }
-    for (auto track : assocTracks) { //<- only for a subset
+    for (auto& track : assocTracks) { //<- only for a subset
       registry.get<TH1>(HIST("etaHistogramAssoc"))->Fill(track.eta()); //<- this should show the selection
       registry.get<TH1>(HIST("ptHistogramAssoc"))->Fill(track.pt());
     }
     
     //Now we do two-particle correlations, using "combinations"
-    for (auto& [trackTrigger, trackAssoc] : combinations(triggerTracks, assocTracks)) {  //<- this is the main change
-        registry.get<TH2>(HIST("correlationFunction"))->Fill(
-                                                             trackTrigger.eta()-trackAssoc.eta(),
-                                                             ComputeDeltaPhi(trackTrigger.phi(), trackAssoc.phi() ));
+    for (auto& [trackTrigger, trackAssoc] : combinations(o2::soa::CombinationsFullIndexPolicy(triggerTracks, assocTracks))) {
+      if(trackTrigger.tpcNClsCrossedRows() < 70 ) continue; //can't filter on dynamic
+      if(trackAssoc.tpcNClsCrossedRows() < 70 ) continue; //can't filter on dynamic
+      registry.get<TH2>(HIST("correlationFunction"))->Fill(
+                                                           trackTrigger.eta()-trackAssoc.eta(),
+                                                           ComputeDeltaPhi(trackTrigger.phi(), trackAssoc.phi() ));
     }
   }
 };

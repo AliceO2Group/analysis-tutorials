@@ -31,11 +31,10 @@ using MyCompleteTracks = soa::Join<aod::Tracks, aod::TracksExtra, aod::TracksDCA
 //In practice, the partitions act on top of the already filtered data.
 //This example also provides specific histograms to inspect the outcome.
 struct partandfiltexample {
-  Partition<o2::aod::Tracks> leftTracks = aod::track::eta < 0;
-  Partition<o2::aod::Tracks> rightTracks = aod::track::eta >= 0;
+  Partition<MyCompleteTracks> leftTracks = aod::track::eta < 0.0f;
+  Partition<MyCompleteTracks> rightTracks = aod::track::eta >= 0.0f;
   Filter etaFilter = nabs(aod::track::eta) < 0.5f;
-  Filter trackQuality = aod::track::tpcNClsFindable - aod::track::tpcNClsFindableMinusCrossedRows >= 70;
-  Filter trackDCA = nabs(aod::track::dcaXY) <= .2;
+  Filter trackDCA = nabs(aod::track::dcaXY) < 0.2f;
 
   //Configurable for number of bins
   Configurable<int> nBins{"nBins", 100, "N bins in all histos"};
@@ -59,11 +58,13 @@ struct partandfiltexample {
     //check getter here: https://aliceo2group.github.io/analysis-framework/docs/datamodel/ao2dTables.html
     registry.get<TH1>(HIST("hVertexZ"))->Fill(collision.posZ());
     //This will take place once per event!
-    for (auto track : leftTracks) { //<- only for a subset
+    for (auto& track : leftTracks) { //<- only for a subset
+      if(track.tpcNClsCrossedRows() < 70 ) continue; //can't filter on dynamic
       registry.get<TH1>(HIST("etaHistogramleft"))->Fill(track.eta()); //<- this should show the selection
       registry.get<TH1>(HIST("ptHistogramleft"))->Fill(track.pt());
     }
-    for (auto track : rightTracks) { //<- only for a subset
+    for (auto& track : rightTracks) { //<- only for a subset
+      if(track.tpcNClsCrossedRows() < 70 ) continue; //can't filter on dynamic
       registry.get<TH1>(HIST("etaHistogramright"))->Fill(track.eta()); //<- this should show the selection
       registry.get<TH1>(HIST("ptHistogramright"))->Fill(track.pt());
     }

@@ -18,6 +18,7 @@
 #include "Framework/runDataProcessing.h"
 #include "Framework/AnalysisTask.h"
 #include "Common/DataModel/TrackSelectionTables.h"
+#include "Framework/ASoAHelpers.h"
 
 using namespace o2;
 using namespace o2::framework;
@@ -32,12 +33,9 @@ using MyCompleteTracks = soa::Join<aod::Tracks, aod::TracksExtra, aod::TracksDCA
 //Otherwise, you'll get an error.
 //Careful with tpc crossed rows: one cannot filter on dynamic columns
 //Therefore, one has to write the expression to filter on by hand
-//When necessary, check the data model online:
-// https://aliceo2group.github.io/analysis-framework/docs/datamodel/ao2dTables.html
 struct filterexample {
   Filter etaFilter = nabs(aod::track::eta) < 0.5f;
-  Filter trackQuality = aod::track::tpcNClsFindable - aod::track::tpcNClsFindableMinusCrossedRows >= 70;
-  Filter trackDCA = nabs(aod::track::dcaXY) <= .2;
+  Filter trackDCA = nabs(aod::track::dcaXY) < 0.2f;
 
   //Configurable for number of bins
   Configurable<int> nBins{"nBins", 100, "N bins in all histos"};
@@ -52,13 +50,12 @@ struct filterexample {
     }
   };
 
-  void process(aod::Collision const& collision, soa::Filtered<MyCompleteTracks> const& tracks) //<- this is the main change
+  void process(aod::Collision const& collision, soa::Filtered<MyCompleteTracks> const& tracks)
   {
-    //Fill the event counter
-    //check getter here: https://aliceo2group.github.io/analysis-framework/docs/datamodel/ao2dTables.html
     registry.get<TH1>(HIST("hVertexZ"))->Fill(collision.posZ());
     //This will take place once per event!
     for (auto& track : tracks) {
+      if(track.tpcNClsCrossedRows() < 70 ) continue; //can't filter on dynamic
       registry.get<TH1>(HIST("etaHistogram"))->Fill(track.eta()); //<- this should show the selection
       registry.get<TH1>(HIST("ptHistogram"))->Fill(track.pt());
     }

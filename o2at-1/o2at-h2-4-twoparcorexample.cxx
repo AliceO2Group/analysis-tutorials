@@ -32,11 +32,10 @@ using MyCompleteTracks = soa::Join<aod::Tracks, aod::TracksExtra, aod::TracksDCA
 //The core part of the 2pc filling utilises two for loops.
 struct twoparcorexample {
   //Fully declarative!
-  Partition<o2::aod::Tracks> triggerTracks = aod::track::pt > 2;
-  Partition<o2::aod::Tracks> assocTracks = aod::track::pt < 2;
+  Partition<MyCompleteTracks> triggerTracks = aod::track::pt > 2.0f;
+  Partition<MyCompleteTracks> assocTracks = aod::track::pt < 2.0f;
   Filter etaFilter = nabs(aod::track::eta) < 0.5f;
-  Filter trackQuality = aod::track::tpcNClsFindable - aod::track::tpcNClsFindableMinusCrossedRows >= 70;
-  Filter trackDCA = nabs(aod::track::dcaXY) <= .2;
+  Filter trackDCA = nabs(aod::track::dcaXY) < 0.2f;
   //Configurable for number of bins
   Configurable<int> nBins{"nBins", 100, "N bins in all histos"};
   // histogram defined with HistogramRegistry
@@ -85,18 +84,22 @@ struct twoparcorexample {
     registry.get<TH1>(HIST("hVertexZ"))->Fill(collision.posZ());
     
     //Inspect the trigger and associated populations
-    for (auto track : triggerTracks) { //<- only for a subset
+    for (auto& track : triggerTracks) { //<- only for a subset
+      if(track.tpcNClsCrossedRows() < 70 ) continue; //can't filter on dynamic
       registry.get<TH1>(HIST("etaHistogramTrigger"))->Fill(track.eta()); //<- this should show the selection
       registry.get<TH1>(HIST("ptHistogramTrigger"))->Fill(track.pt());
     }
-    for (auto track : assocTracks) { //<- only for a subset
+    for (auto& track : assocTracks) { //<- only for a subset
+      if(track.tpcNClsCrossedRows() < 70 ) continue; //can't filter on dynamic
       registry.get<TH1>(HIST("etaHistogramAssoc"))->Fill(track.eta()); //<- this should show the selection
       registry.get<TH1>(HIST("ptHistogramAssoc"))->Fill(track.pt());
     }
     
     //Now we do two-particle correlations, but still manually
     for (auto trackTrigger : triggerTracks) { //<- only for trigger
+      if(trackTrigger.tpcNClsCrossedRows() < 70 ) continue; //can't filter on dynamic
       for (auto trackAssoc : assocTracks) { //<- only for associated
+        if(trackAssoc.tpcNClsCrossedRows() < 70 ) continue; //can't filter on dynamic
         registry.get<TH2>(HIST("correlationFunction"))->Fill(
                                                              trackTrigger.eta()-trackAssoc.eta(),
                                                              ComputeDeltaPhi(trackTrigger.phi(), trackAssoc.phi() ));

@@ -45,7 +45,7 @@ struct subscriptionexample {
     }
   };
 
-  void process(aod::Collision const& collision, soa::Join<aod::TracksIU, aod::TracksExtra> const& tracks) //<- this is the main change
+  void process(aod::Collision const& collision, soa::Join<aod::TracksIU, aod::TracksExtra> const& tracks)
   {
     //Fill the event counter
     //check getter here: https://aliceo2group.github.io/analysis-framework/docs/datamodel/ao2dTables.html

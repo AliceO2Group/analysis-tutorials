@@ -32,8 +32,8 @@ using MyCompleteTracks = soa::Join<aod::Tracks, aod::TracksExtra, aod::TracksDCA
 //but the usage of a specific partition inside the process function can now be used.
 //This is all pretty similar to PYTHON list handling.
 struct partitionexample {
-  Partition<o2::aod::Tracks> leftTracks = aod::track::eta < 0;
-  Partition<o2::aod::Tracks> rightTracks = aod::track::eta >= 0;
+  Partition<MyCompleteTracks> leftTracks = aod::track::eta < 0.0f;
+  Partition<MyCompleteTracks> rightTracks = aod::track::eta >= 0.0f;
 
   //Configurable for number of bins
   Configurable<int> nBins{"nBins", 100, "N bins in all histos"};
@@ -57,11 +57,11 @@ struct partitionexample {
     //check getter here: https://aliceo2group.github.io/analysis-framework/docs/datamodel/ao2dTables.html
     registry.get<TH1>(HIST("hVertexZ"))->Fill(collision.posZ());
     //This will take place once per event!
-    for (auto track : leftTracks) { //<- only for a subset
+    for (auto& track : leftTracks) { //<- only for a subset
       registry.get<TH1>(HIST("etaHistogramleft"))->Fill(track.eta()); //<- this should show the selection
       registry.get<TH1>(HIST("ptHistogramleft"))->Fill(track.pt());
     }
-    for (auto track : rightTracks) { //<- only for a subset
+    for (auto& track : rightTracks) { //<- only for a subset
       registry.get<TH1>(HIST("etaHistogramright"))->Fill(track.eta()); //<- this should show the selection
       registry.get<TH1>(HIST("ptHistogramright"))->Fill(track.pt());
     }

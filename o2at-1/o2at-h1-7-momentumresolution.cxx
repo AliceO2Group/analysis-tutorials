@@ -44,14 +44,12 @@ struct momentumresolution {
       {"hVertexZ", "hVertexZ", {HistType::kTH1F, {{120, -15., 15.}}}},
       {"etaHistogram", "etaHistogram", {HistType::kTH1F, {{nBinsEta, -1., +1}}}},
       {"ptHistogram", "ptHistogram", {HistType::kTH1F, {{nBinsPt, 0., 10.0}}}},
-      {"resoHistogram", "resoHistogram", {HistType::kTH2F, {{nBinsPt, 0., 10.0}, {100, -10.0, 10.0}}}}
+      {"resoHistogram", "resoHistogram", {HistType::kTH2F, {{nBinsPt, 0., 10.0}, {100, -.5, .5}}}}
     }
   };
 
-  void process(aod::Collision const& collision, soa::Join<aod::Tracks, aod::TracksExtra, aod::TracksDCA, aod::McTrackLabels> const& tracks, aod::McParticles const&) //<- this is the main change
+  void process(aod::Collision const& collision, soa::Join<aod::Tracks, aod::TracksExtra, aod::TracksDCA, aod::McTrackLabels> const& tracks, aod::McParticles const&)
   {
-    //Fill the event counter
-    //check getter here: https://aliceo2group.github.io/analysis-framework/docs/datamodel/ao2dTables.html
     registry.get<TH1>(HIST("hVertexZ"))->Fill(collision.posZ());
     //This will take place once per event!
     for (auto& track : tracks) {
@@ -62,9 +60,7 @@ struct momentumresolution {
       
       //Resolve MC track - no need to touch index!
       auto mcParticle = track.mcParticle_as<aod::McParticles>();
-      
-      //Very rough momentum resolution
-      float delta = track.pt() - mcParticle.pt();
+      float delta = track.pt() - mcParticle.pt() ;
       registry.get<TH2>(HIST("resoHistogram"))->Fill(track.pt(), delta);
     }
   }

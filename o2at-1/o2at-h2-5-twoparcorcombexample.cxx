@@ -37,9 +37,9 @@ struct twoparcorcombexample {
   Filter etaFilter = nabs(aod::track::eta) < 0.5f;
   Filter trackDCA = nabs(aod::track::dcaXY) < 0.2f;
   using MyFilteredTracks = soa::Filtered<MyCompleteTracks>;
-
-  Partition<MyFilteredTracks> leftTracks = aod::track::eta < 0.0f;
-  Partition<MyFilteredTracks> rightTracks = aod::track::eta >= 0.0f;
+  Partition<MyFilteredTracks> triggerTracks = aod::track::pt > 2.0f;
+  Partition<MyFilteredTracks> assocTracks = aod::track::pt < 2.0f;
+  
   //Configurable for number of bins
   Configurable<int> nBins{"nBins", 100, "N bins in all histos"};
   // histogram defined with HistogramRegistry

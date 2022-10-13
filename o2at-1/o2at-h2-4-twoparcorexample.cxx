@@ -33,7 +33,7 @@ using MyCompleteTracks = soa::Join<aod::Tracks, aod::TracksExtra, aod::TracksDCA
 //The core part of the 2pc filling utilises two for loops.
 struct twoparcorexample {
   // all defined filters are applied
-  Filter trackFilter = nabs(aod::track::eta) < 0.8f && aod::track::pt > 4.0f;
+  Filter trackFilter = nabs(aod::track::eta) < 0.8f && aod::track::pt > 2.0f;
   Filter trackDCA = nabs(aod::track::dcaXY) < 0.2f;
   using MyFilteredTracks = soa::Filtered<MyCompleteTracks>;
   Partition<MyFilteredTracks> triggerTracks = aod::track::pt > 4.0f;

@@ -36,8 +36,8 @@ struct twoparcorexample {
   Filter trackFilter = nabs(aod::track::eta) < 0.8f && aod::track::pt > 4.0f;
   Filter trackDCA = nabs(aod::track::dcaXY) < 0.2f;
   using MyFilteredTracks = soa::Filtered<MyCompleteTracks>;
-  Partition<MyFilteredTracks> triggerTracks = aod::track::pt > 8.0f;
-  Partition<MyFilteredTracks> assocTracks = aod::track::pt < 6.0f;
+  Partition<MyFilteredTracks> triggerTracks = aod::track::pt > 4.0f;
+  Partition<MyFilteredTracks> assocTracks = aod::track::pt < 4.0f;
   
   //Configurable for number of bins
   Configurable<int> nBins{"nBins", 100, "N bins in all histos"};
@@ -86,22 +86,26 @@ struct twoparcorexample {
     //check getter here: https://aliceo2group.github.io/analysis-framework/docs/datamodel/ao2dTables.html
     registry.get<TH1>(HIST("hVertexZ"))->Fill(collision.posZ());
     
+    //partitions are not grouped by default
+    auto triggerTracksGrouped = triggerTracks->sliceByCached(aod::track::collisionId, collision.globalIndex());
+    auto assocTracksGrouped = assocTracks->sliceByCached(aod::track::collisionId, collision.globalIndex());
+
     //Inspect the trigger and associated populations
-    for (auto& track : triggerTracks) { //<- only for a subset
+    for (auto& track : triggerTracksGrouped) { //<- only for a subset
       if(track.tpcNClsCrossedRows() < 70 ) continue; //can't filter on dynamic
       registry.get<TH1>(HIST("etaHistogramTrigger"))->Fill(track.eta()); //<- this should show the selection
       registry.get<TH1>(HIST("ptHistogramTrigger"))->Fill(track.pt());
     }
-    for (auto& track : assocTracks) { //<- only for a subset
+    for (auto& track : assocTracksGrouped) { //<- only for a subset
       if(track.tpcNClsCrossedRows() < 70 ) continue; //can't filter on dynamic
       registry.get<TH1>(HIST("etaHistogramAssoc"))->Fill(track.eta()); //<- this should show the selection
       registry.get<TH1>(HIST("ptHistogramAssoc"))->Fill(track.pt());
     }
     
     //Now we do two-particle correlations, but still manually
-    for (auto trackTrigger : triggerTracks) { //<- only for trigger
+    for (auto trackTrigger : triggerTracksGrouped) { //<- only for trigger
       if(trackTrigger.tpcNClsCrossedRows() < 70 ) continue; //can't filter on dynamic
-      for (auto trackAssoc : assocTracks) { //<- only for associated
+      for (auto trackAssoc : assocTracksGrouped) { //<- only for associated
         if(trackAssoc.tpcNClsCrossedRows() < 70 ) continue; //can't filter on dynamic
         registry.get<TH1>(HIST("correlationFunction"))->Fill( ComputeDeltaPhi(trackTrigger.phi(), trackAssoc.phi() ));
       }

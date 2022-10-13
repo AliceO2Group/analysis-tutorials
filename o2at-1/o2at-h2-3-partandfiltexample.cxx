@@ -61,13 +61,18 @@ struct partandfiltexample {
     //Fill the event counter
     //check getter here: https://aliceo2group.github.io/analysis-framework/docs/datamodel/ao2dTables.html
     registry.get<TH1>(HIST("hVertexZ"))->Fill(collision.posZ());
+    
+    //partitions are not grouped by default
+    auto leftTracksGrouped = leftTracks->sliceByCached(aod::track::collisionId, collision.globalIndex());
+    auto rightTracksGrouped = rightTracks->sliceByCached(aod::track::collisionId, collision.globalIndex());
+    
     //This will take place once per event!
-    for (auto& track : leftTracks) { //<- only for a subset
+    for (auto& track : leftTracksGrouped) { //<- only for a subset
       if(track.tpcNClsCrossedRows() < 70 ) continue; //can't filter on dynamic
       registry.get<TH1>(HIST("etaHistogramleft"))->Fill(track.eta()); //<- this should show the selection
       registry.get<TH1>(HIST("ptHistogramleft"))->Fill(track.pt());
     }
-    for (auto& track : rightTracks) { //<- only for a subset
+    for (auto& track : rightTracksGrouped) { //<- only for a subset
       if(track.tpcNClsCrossedRows() < 70 ) continue; //can't filter on dynamic
       registry.get<TH1>(HIST("etaHistogramright"))->Fill(track.eta()); //<- this should show the selection
       registry.get<TH1>(HIST("ptHistogramright"))->Fill(track.pt());

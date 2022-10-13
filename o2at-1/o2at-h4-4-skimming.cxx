@@ -26,7 +26,9 @@ using namespace o2;
 using namespace o2::framework;
 using namespace o2::framework::expressions;
 
-// STEP 1
+// STEP 4
+// This is the same as STEP 3, but now we read the derived table from the derived AO2D.root written on disk
+
 //<- starting point, define the derived table to be stored
 // this can be done in a separated header file, but for semplicity we do it in
 // the same file here
@@ -51,71 +53,6 @@ DECLARE_SOA_TABLE(MyTable, "AOD", "MYTABLE", //!
 
 } // namespace o2::aod
 
-// STEP 2
-struct ReadHFCandidates { //<- simple workflow that loops over HF 2-prong
-                          // candidates
-
-  void process(aod::HfCandProng2 const& cand2Prongs)
-  {
-
-    // loop over HF 2-prong candidates
-    for (auto& cand : cand2Prongs) {
-
-      // check first if the HF 2-prong candidate is tagged as a D0
-      bool isD0Sel = TESTBIT(cand.hfflag(), aod::hf_cand_prong2::DecayType::D0ToPiK);
-
-      if (!isD0Sel) {
-        continue;
-      }
-
-      auto invMassD0 = InvMassD0(cand);
-      auto invMassD0bar = InvMassD0bar(cand);
-
-      LOG(debug) << "Candidate with mass(D0) = " << invMassD0
-                 << ", mass(D0bar) = " << invMassD0bar
-                 << ", pt = " << cand.pt()
-                 << ", cos(theta_P) = " << cand.cpa();
-    }
-  }
-};
-
-// STEP 3
-struct ProduceDerivedTable { //<- workflow that loops over HF 2-prong
-                             // candidates and fills a derived table
-
-  Produces<aod::MyTable> tableWithDzeroCandidates;
-
-  void process(aod::HfCandProng2 const& cand2Prongs, aod::Tracks const&)
-  {
-
-    // loop over 2-prong candidates
-    for (auto& cand : cand2Prongs) {
-
-      // check first if the HF 2-prong candidate is tagged as a D0
-      bool isD0Sel = TESTBIT(cand.hfflag(), aod::hf_cand_prong2::DecayType::D0ToPiK);
-
-      // let's select only D0 andidates with pT > 4 GeV/c
-      if (!isD0Sel || cand.pt() < 4.) {
-        continue;
-      }
-
-      auto invMassD0 = InvMassD0(cand);
-      auto invMassD0bar = InvMassD0bar(cand);
-
-      LOG(debug) << "Candidate with mass(D0) = " << invMassD0
-                 << ", mass(D0bar) = " << invMassD0bar
-                 << ", pt = " << cand.pt()
-                 << ", cos(theta_P) = " << cand.cpa();
-
-      // we retrieve also the event index from one of the daughters
-      auto dauTrack = cand.index0_as<aod::Tracks>(); // positive daughter
-
-      tableWithDzeroCandidates(invMassD0, invMassD0bar, cand.pt(), cand.cpa(), dauTrack.collisionId());
-    }
-  }
-};
-
-// STEP 4
 struct ReadDerivedTable { //<- workflow that reads derived table and fill
                           // histograms
 
@@ -140,7 +77,5 @@ struct ReadDerivedTable { //<- workflow that reads derived table and fill
 
 WorkflowSpec defineDataProcessing(ConfigContext const& cfgc)
 {
-  return WorkflowSpec{adaptAnalysisTask<ReadHFCandidates>(cfgc),
-                      adaptAnalysisTask<ProduceDerivedTable>(cfgc),
-                      adaptAnalysisTask<ReadDerivedTable>(cfgc)};
+  return WorkflowSpec{adaptAnalysisTask<ReadDerivedTable>(cfgc)};
 }

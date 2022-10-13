@@ -86,15 +86,15 @@ struct vzeromcexample {
         auto v0mcparticle = v0.mcParticle();
         //check particle PDG code to see if it's the one you want
         if ( v0mcparticle.pdgCode() == 310 ) registry.fill(HIST("hMassTrueK0Short"), v0.mK0Short());
-        if ( v0mcparticle.pdgCode() == 3122 ) registry.fill(HIST("hMassLambda"), v0.mK0Short());
-        if ( v0mcparticle.pdgCode() ==-3122 ) registry.fill(HIST("hMassAntiLambda"), v0.mK0Short());
+        if ( v0mcparticle.pdgCode() == 3122 ) registry.fill(HIST("hMassTrueLambda"), v0.mLambda());
+        if ( v0mcparticle.pdgCode() ==-3122 ) registry.fill(HIST("hMassTrueAntiLambda"), v0.mAntiLambda());
       }
       
     }
   }
   
   //define first process function, used to process Run2 data
-  void processRun2(soa::Join<aod::Collisions, aod::EvSels>::iterator const& collision, soa::Filtered<LabeledV0s> const& V0s, MyTracksRun2 const& tracks)
+  void processRun2(soa::Join<aod::Collisions, aod::EvSels>::iterator const& collision, soa::Filtered<LabeledV0s> const& V0s, MyTracksRun2 const& tracks, aod::McParticles const&)
   {
     //Basic event selection (all helper tasks are now included!)
     if (!collision.sel7()) {
@@ -109,7 +109,7 @@ struct vzeromcexample {
   PROCESS_SWITCH(vzeromcexample, processRun2, "Process Run 2 data", false);
 
   //define first process function, used to process Run3 data
-  void processRun3(soa::Join<aod::Collisions, aod::EvSels>::iterator const& collision, soa::Filtered<LabeledV0s> const& V0s, MyTracksRun3 const& tracks)
+  void processRun3(soa::Join<aod::Collisions, aod::EvSels>::iterator const& collision, soa::Filtered<LabeledV0s> const& V0s, MyTracksRun3 const& tracks, aod::McParticles const&)
   {
     //Basic event selection (all helper tasks are now included!)
     if (!collision.sel8()) {

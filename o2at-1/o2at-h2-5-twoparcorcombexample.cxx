@@ -34,11 +34,11 @@ using MyCompleteTracks = soa::Join<aod::Tracks, aod::TracksExtra, aod::TracksDCA
 //that is in principle more efficient.
 struct twoparcorcombexample {
   // all defined filters are applied
-  Filter etaFilter = nabs(aod::track::eta) < 0.5f;
+  Filter trackFilter = nabs(aod::track::eta) < 0.8f && aod::track::pt > 4.0f;
   Filter trackDCA = nabs(aod::track::dcaXY) < 0.2f;
   using MyFilteredTracks = soa::Filtered<MyCompleteTracks>;
-  Partition<MyFilteredTracks> triggerTracks = aod::track::pt > 2.0f;
-  Partition<MyFilteredTracks> assocTracks = aod::track::pt < 2.0f;
+  Partition<MyFilteredTracks> triggerTracks = aod::track::pt > 6.0f;
+  Partition<MyFilteredTracks> assocTracks = aod::track::pt < 6.0f;
   
   //Configurable for number of bins
   Configurable<int> nBins{"nBins", 100, "N bins in all histos"};
@@ -100,7 +100,9 @@ struct twoparcorcombexample {
     for (auto& [trackTrigger, trackAssoc] : combinations(o2::soa::CombinationsFullIndexPolicy(triggerTracks, assocTracks))) {
       if(trackTrigger.tpcNClsCrossedRows() < 70 ) continue; //can't filter on dynamic
       if(trackAssoc.tpcNClsCrossedRows() < 70 ) continue; //can't filter on dynamic
-      registry.get<TH1>(HIST("correlationFunction"))->Fill(ComputeDeltaPhi(trackTrigger.phi(), trackAssoc.phi() ));
+      if( TMath::Abs(trackTrigger.eta() - trackAssoc.eta() ) < 0.4 ){
+        registry.get<TH1>(HIST("correlationFunction"))->Fill( ComputeDeltaPhi(trackTrigger.phi(), trackAssoc.phi() ));
+      }
     }
   }
 };

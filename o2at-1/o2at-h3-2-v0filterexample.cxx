@@ -38,7 +38,9 @@ struct vzerofilterexample {
   Configurable<float> v0radius{"v0radius", 0.5, "v0radius"};
 
   //Cannot filter on dynamic columns, so we cut on DCA to PV and DCA between daus only!
-  Filter preFilterV0 = nabs(aod::v0data::dcapostopv) > dcapostopv&& nabs(aod::v0data::dcanegtopv) > dcanegtopv&& aod::v0data::dcaV0daughters < dcav0dau;
+  Filter preFilterV0 = nabs(aod::v0data::dcapostopv) > dcapostopv&&
+                       nabs(aod::v0data::dcanegtopv) > dcanegtopv&&
+                       aod::v0data::dcaV0daughters < dcav0dau;
   
   // histogram defined with HistogramRegistry
   HistogramRegistry registry{

@@ -28,7 +28,6 @@ using namespace o2::framework::expressions;
 //Note: numbers are not allowed in task names
 
 struct vzeroexample {
-
   //Configurable for number of bins
   Configurable<int> nBins{"nBins", 100, "N bins in all histos"};
 

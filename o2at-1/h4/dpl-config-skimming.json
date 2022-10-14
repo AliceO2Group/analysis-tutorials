@@ -1,0 +1,183 @@
+{
+    "internal-dpl-clock": "",
+    "internal-dpl-aod-reader": {
+        "time-limit": "300",
+        "orbit-offset-enumeration": "0",
+        "orbit-multiplier-enumeration": "0",
+        "start-value-enumeration": "0",
+        "end-value-enumeration": "-1",
+        "step-value-enumeration": "1",
+        "aod-file": "AO2D-HF.root"
+    },
+    "internal-dpl-aod-index-builder": "",
+    "internal-dpl-aod-spawner": "",
+    "timestamp-task": {
+        "verbose": "false",
+        "rct-path": "RCT\/RunInformation",
+        "orbit-reset-path": "CTP\/Calib\/OrbitReset",
+        "ccdb-url": "http:\/\/alice-ccdb.cern.ch",
+        "isRun2MC": "false"
+    },
+    "track-propagation": {
+        "ccdb-url": "http:\/\/alice-ccdb.cern.ch",
+        "lutPath": "GLO\/Param\/MatLUT",
+        "geoPath": "GLO\/Config\/GeometryAligned",
+        "grpPath": "GLO\/GRP\/GRP",
+        "mVtxPath": "GLO\/Calib\/MeanVertex",
+        "processStandard": "false",
+        "processCovariance": "true"
+    },
+    "bc-selection-task": {
+        "processRun2": "false",
+        "processRun3": "true"
+    },
+    "event-selection-task": {
+        "syst": "pp",
+        "muonSelection": "0",
+        "customDeltaBC": "300",
+        "isMC": "true",
+        "processRun2": "false",
+        "processRun3": "true"
+    },
+    "track-selection": {
+        "isRun3": "true"
+    },
+    "hf-tag-sel-tracks": {
+        "fillHistograms": "true",
+        "debug": "false",
+        "bz": "5",
+        "doPvRefit": "false",
+        "doCutQuality": "true",
+        "useIsGlobalTrackWoDCA": "true",
+        "tpcNClsFound": "50",
+        "pTBinsTrack": {
+            "values": [
+                "0",
+                "0.5",
+                "1",
+                "1.5",
+                "2",
+                "3",
+                "1000"
+            ]
+        },
+        "pTMinTrack2Prong": "0.3",
+        "cutsTrack2Prong": {
+            "labels_rows": "",
+            "labels_cols": [
+                "min_dcaxytoprimary",
+                "max_dcaxytoprimary"
+            ],
+            "values": [
+                [
+                    "0.",
+                    "10"
+                ],
+                [
+                    "0.",
+                    "10"
+                ],
+                [
+                    "0.",
+                    "10"
+                ],
+                [
+                    "0.",
+                    "10"
+                ],
+                [
+                    "0",
+                    "10"
+                ],
+                [
+                    "0",
+                    "10"
+                ]
+            ]
+        },
+        "etaMax2Prong": "0.8",
+        "pTMinTrack3Prong": "10000.",
+        "etaMax3Prong": "0.",
+        "ptMinTrackBach": "10000.",
+        "etaMaxBach": "0"
+    },
+    "hf-tag-sel-collisions": {
+        "fillHistograms": "true",
+        "xVertexMin": "-100",
+        "xVertexMax": "100",
+        "yVertexMin": "-100",
+        "yVertexMax": "100",
+        "zVertexMin": "-10",
+        "zVertexMax": "10",
+        "nContribMin": "0",
+        "chi2Max": "0",
+        "triggerClassName": "kINT7",
+        "useSel8Trigger": "false",
+        "processTrigSel": "false",
+        "processNoTrigSel": "true"
+    },
+    "multiplicity-table": {
+        "processRun2": "false",
+        "processRun3": "true"
+    },
+    "hf-track-index-skims-creator": {
+        "debug": "false",
+        "fillHistograms": "true",
+        "do3prong": "0",
+        "doPvRefit": "false",
+        "pTTolerance": "0.1",
+        "bz": "5",
+        "propToDCA": "true",
+        "useAbsDCA": "true",
+        "maxRad": "200",
+        "maxDZIni": "4",
+        "minParamChange": "0.001",
+        "minRelChi2Change": "0.9",
+        "pTBinsD0ToPiK": {
+            "values": [
+                "0",
+                "5",
+                "1000"
+            ]
+        },
+        "cutsD0ToPiK": {
+            "labels_rows": "",
+            "labels_cols": [
+                "massMin",
+                "massMax",
+                "cosp",
+                "d0d0"
+            ],
+            "values": [
+                [
+                    "1.7",
+                    "2.15",
+                    "-1.",
+                    "1"
+                ],
+                [
+                    "1.7",
+                    "2.15",
+                    "-1.",
+                    "1"
+                ]
+            ]
+        },
+        "pTBinsJpsiToEE": {
+            "values": [
+                "10000",
+                "10000",
+                "10000"
+            ]
+        },
+        "pTBinsJpsiToMuMu": {
+            "values": [
+                "10000",
+                "10000",
+                "10000"
+            ]
+        }
+    },
+    "internal-dpl-aod-global-analysis-file-sink": "",
+    "internal-dpl-aod-writer": ""
+}

@@ -88,6 +88,5 @@ struct ProduceDerivedTable { //<- workflow that loops over HF 2-prong
 
 WorkflowSpec defineDataProcessing(ConfigContext const& cfgc)
 {
-  return WorkflowSpec{adaptAnalysisTask<ReadHFCandidates>(cfgc),
-                      adaptAnalysisTask<ProduceDerivedTable>(cfgc)};
+  return WorkflowSpec{adaptAnalysisTask<ProduceDerivedTable>(cfgc)};
 }

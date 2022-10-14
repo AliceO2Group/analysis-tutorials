@@ -110,6 +110,5 @@ struct ReadDerivedTable { //<- workflow that reads derived table and fill
 
 WorkflowSpec defineDataProcessing(ConfigContext const& cfgc)
 {
-  return WorkflowSpec{adaptAnalysisTask<ProduceDerivedTable>(cfgc),
-                      adaptAnalysisTask<ReadDerivedTable>(cfgc)};
+  return WorkflowSpec{adaptAnalysisTask<ReadDerivedTable>(cfgc)};
 }

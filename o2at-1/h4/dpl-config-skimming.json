@@ -120,7 +120,7 @@
         "processRun2": "false",
         "processRun3": "true"
     },
-    "hf-track-index-skims-creator": {
+    "hf-track-index-skim-creator": {
         "debug": "false",
         "fillHistograms": "true",
         "do3prong": "0",

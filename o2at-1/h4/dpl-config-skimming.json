@@ -42,7 +42,7 @@
     "track-selection": {
         "isRun3": "true"
     },
-    "hf-tag-sel-tracks": {
+    "hf-track-index-skim-creator-tag-sel-tracks": {
         "fillHistograms": "true",
         "debug": "false",
         "bz": "5",
@@ -101,7 +101,7 @@
         "ptMinTrackBach": "10000.",
         "etaMaxBach": "0"
     },
-    "hf-tag-sel-collisions": {
+    "hf-track-index-skim-creator-tag-sel-collisions": {
         "fillHistograms": "true",
         "xVertexMin": "-100",
         "xVertexMax": "100",

@@ -133,7 +133,7 @@
         "maxDZIni": "4",
         "minParamChange": "0.001",
         "minRelChi2Change": "0.9",
-        "pTBinsD0ToPiK": {
+        "binsPtD0ToPiK": {
             "values": [
                 "0",
                 "5",

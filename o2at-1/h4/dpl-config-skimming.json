@@ -95,7 +95,7 @@
                 ]
             ]
         },
-        "etaMax2Prong": "0.8",
+        "etaMaxTrack2Prong": "0.8",
         "ptMinTrack3Prong": "10000.",
         "etaMax3Prong": "0.",
         "ptMinTrackBach": "10000.",

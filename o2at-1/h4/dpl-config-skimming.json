@@ -61,7 +61,7 @@
                 "1000"
             ]
         },
-        "pTMinTrack2Prong": "0.3",
+        "ptMinTrack2Prong": "0.3",
         "cutsTrack2Prong": {
             "labels_rows": "",
             "labels_cols": [

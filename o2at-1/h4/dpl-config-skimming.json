@@ -123,7 +123,7 @@
     "hf-track-index-skim-creator": {
         "debug": "false",
         "fillHistograms": "true",
-        "do3prong": "0",
+        "do3Prong": "0",
         "doPvRefit": "false",
         "pTTolerance": "0.1",
         "bz": "5",

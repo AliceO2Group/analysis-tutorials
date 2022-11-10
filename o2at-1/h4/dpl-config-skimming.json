@@ -125,7 +125,7 @@
         "fillHistograms": "true",
         "do3Prong": "0",
         "doPvRefit": "false",
-        "pTTolerance": "0.1",
+        "ptTolerance": "0.1",
         "bz": "5",
         "propToDCA": "true",
         "useAbsDCA": "true",

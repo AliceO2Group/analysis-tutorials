@@ -49,8 +49,8 @@
         "doPvRefit": "false",
         "doCutQuality": "true",
         "useIsGlobalTrackWoDCA": "true",
-        "tpcNClsFound": "50",
-        "pTBinsTrack": {
+        "tpcNClsFoundMin": "50",
+        "binsPtTrack": {
             "values": [
                 "0",
                 "0.5",

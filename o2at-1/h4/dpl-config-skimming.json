@@ -99,7 +99,7 @@
         "ptMinTrack3Prong": "10000.",
         "etaMaxTrack3Prong": "0.",
         "ptMinTrackBach": "10000.",
-        "etaMaxBach": "0"
+        "etaMaxTrackBach": "0"
     },
     "hf-track-index-skim-creator-tag-sel-collisions": {
         "fillHistograms": "true",

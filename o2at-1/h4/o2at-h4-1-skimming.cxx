@@ -67,8 +67,8 @@ struct ReadHFCandidates { //<- simple workflow that loops over HF 2-prong
         continue;
       }
 
-      auto invMassD0 = InvMassD0(cand);
-      auto invMassD0bar = InvMassD0bar(cand);
+      auto invMassD0 = invMassD0ToPiK(cand);
+      auto invMassD0bar = invMassD0barToKPi(cand);
 
       LOG(debug) << "Candidate with mass(D0) = " << invMassD0
                  << ", mass(D0bar) = " << invMassD0bar

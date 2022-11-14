@@ -54,14 +54,14 @@ DECLARE_SOA_TABLE(MyTable, "AOD", "MYTABLE", //!
 struct ReadHFCandidates { //<- simple workflow that loops over HF 2-prong
                           // candidates
 
-  void process(aod::HfCandProng2 const& cand2Prongs)
+  void process(aod::HfCand2Prong const& cand2Prongs)
   {
 
     // loop over HF 2-prong candidates
     for (auto& cand : cand2Prongs) {
 
       // check first if the HF 2-prong candidate is tagged as a D0
-      bool isD0Sel = TESTBIT(cand.hfflag(), aod::hf_cand_prong2::DecayType::D0ToPiK);
+      bool isD0Sel = TESTBIT(cand.hfflag(), aod::hf_cand_2prong::DecayType::D0ToPiK);
 
       if (!isD0Sel) {
         continue;

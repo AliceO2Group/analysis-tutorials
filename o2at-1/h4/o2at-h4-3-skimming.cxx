@@ -56,14 +56,14 @@ struct ProduceDerivedTable { //<- workflow that loops over HF 2-prong
 
   Produces<aod::MyTable> tableWithDzeroCandidates;
 
-  void process(aod::HfCandProng2 const& cand2Prongs, aod::Tracks const&)
+  void process(aod::HfCand2Prong const& cand2Prongs, aod::Tracks const&)
   {
 
     // loop over 2-prong candidates
     for (auto& cand : cand2Prongs) {
 
       // check first if the HF 2-prong candidate is tagged as a D0
-      bool isD0Sel = TESTBIT(cand.hfflag(), aod::hf_cand_prong2::DecayType::D0ToPiK);
+      bool isD0Sel = TESTBIT(cand.hfflag(), aod::hf_cand_2prong::DecayType::D0ToPiK);
 
       // let's select only D0 andidates with pT > 4 GeV/c
       if (!isD0Sel || cand.pt() < 4.) {
@@ -79,7 +79,7 @@ struct ProduceDerivedTable { //<- workflow that loops over HF 2-prong
                  << ", cos(theta_P) = " << cand.cpa();
 
       // we retrieve also the event index from one of the daughters
-      auto dauTrack = cand.index0_as<aod::Tracks>(); // positive daughter
+      auto dauTrack = cand.prong0_as<aod::Tracks>(); // positive daughter
 
       tableWithDzeroCandidates(invMassD0, invMassD0bar, cand.pt(), cand.cpa(), dauTrack.collisionId());
     }

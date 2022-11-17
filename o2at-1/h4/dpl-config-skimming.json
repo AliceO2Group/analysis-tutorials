@@ -42,15 +42,15 @@
     "track-selection": {
         "isRun3": "true"
     },
-    "hf-tag-sel-tracks": {
+    "hf-track-index-skim-creator-tag-sel-tracks": {
         "fillHistograms": "true",
         "debug": "false",
         "bz": "5",
         "doPvRefit": "false",
         "doCutQuality": "true",
         "useIsGlobalTrackWoDCA": "true",
-        "tpcNClsFound": "50",
-        "pTBinsTrack": {
+        "tpcNClsFoundMin": "50",
+        "binsPtTrack": {
             "values": [
                 "0",
                 "0.5",
@@ -61,7 +61,7 @@
                 "1000"
             ]
         },
-        "pTMinTrack2Prong": "0.3",
+        "ptMinTrack2Prong": "0.3",
         "cutsTrack2Prong": {
             "labels_rows": "",
             "labels_cols": [
@@ -95,13 +95,13 @@
                 ]
             ]
         },
-        "etaMax2Prong": "0.8",
-        "pTMinTrack3Prong": "10000.",
-        "etaMax3Prong": "0.",
+        "etaMaxTrack2Prong": "0.8",
+        "ptMinTrack3Prong": "10000.",
+        "etaMaxTrack3Prong": "0.",
         "ptMinTrackBach": "10000.",
-        "etaMaxBach": "0"
+        "etaMaxTrackBach": "0"
     },
-    "hf-tag-sel-collisions": {
+    "hf-track-index-skim-creator-tag-sel-collisions": {
         "fillHistograms": "true",
         "xVertexMin": "-100",
         "xVertexMax": "100",
@@ -120,20 +120,20 @@
         "processRun2": "false",
         "processRun3": "true"
     },
-    "hf-track-index-skims-creator": {
+    "hf-track-index-skim-creator": {
         "debug": "false",
         "fillHistograms": "true",
-        "do3prong": "0",
+        "do3Prong": "0",
         "doPvRefit": "false",
-        "pTTolerance": "0.1",
+        "ptTolerance": "0.1",
         "bz": "5",
-        "propToDCA": "true",
+        "propagateToPCA": "true",
         "useAbsDCA": "true",
-        "maxRad": "200",
+        "maxR": "200",
         "maxDZIni": "4",
         "minParamChange": "0.001",
         "minRelChi2Change": "0.9",
-        "pTBinsD0ToPiK": {
+        "binsPtD0ToPiK": {
             "values": [
                 "0",
                 "5",
@@ -163,14 +163,14 @@
                 ]
             ]
         },
-        "pTBinsJpsiToEE": {
+        "binsPtJpsiToEE": {
             "values": [
                 "10000",
                 "10000",
                 "10000"
             ]
         },
-        "pTBinsJpsiToMuMu": {
+        "binsPtJpsiToMuMu": {
             "values": [
                 "10000",
                 "10000",

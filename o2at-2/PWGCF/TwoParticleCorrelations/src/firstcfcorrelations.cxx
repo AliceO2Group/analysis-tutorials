@@ -186,7 +186,6 @@ struct firstcorrelations {
 
   void processMixed(soa::Filtered<soa::Join<aod::Collisions, aod::EvSels, aod::CentRun2V0Ms>>& collisions, soa::Filtered<soa::Join<aod::Tracks, aod::TrackSelection>> const& tracks)
   {
-    // Strictly upper categorised collisions, for cfgNoMixedEvents combinations per bin, skipping those in entry -1
     LOGF(info, "Received %d collisions", collisions.size());
     for (auto& [collision1, tracks1, collision2, tracks2] : pair) {
       if (logcollpairs < 500) {
@@ -194,8 +193,6 @@ struct firstcorrelations {
         LOGF(info, "Received collision pair %d: %ld (%f, %f), %ld (%f, %f)", logcollpairs, collision1.globalIndex(), collision1.posZ(), collision1.centRun2V0M(), collision2.globalIndex(), collision2.posZ(), collision2.centRun2V0M());
       }
 
-      // TODO in principle these should be already checked on hash level, because in this way we don't check collision 2
-      // TODO not correct because event-level histograms on collision1 are filled for each pair (important :))
       if (fillCollision(mixed, collision1, collision1.centRun2V0M()) == false) {
         continue;
       }

@@ -1,27 +1,29 @@
 # O2AT - Second edition - Machine Learning primer
 
+Welcome to the O2AT ML tutorial. Today we will have a look at how to train Boosted Decision Trees (BDTs) and Shallow Neural Networks (NN) in Python and how to use them in O2Physics analyses.
 
-## Neural network regression
+Before we start some preliminary steps are needed. Follow them heareafter!
 
-The notebook on neural network regression is meant as complementary material to the presentation given in the O2 analysis tutorial (24.04.23 - 28.04.23). It illustrates the basics of neural network regression and shows how to import, train and export data and neural network models using pytorch.
+## SWAN setup
 
-### Table of contents
-* [Information](#general-info)
-* [Classes](#classes)
-* [Example data](#data)
+We will run this tutorial on CERN SWAN, so click here
 
-### Information
+[![Open in SWAN](https://swanserver.web.cern.ch/swanserver/images/badge_swan_white_150.png)](https://cern.ch/swanserver/cgi-bin/go?projurl=https://github.com/fcatalan92/analysis-tutorials.git)
 
-The neural network code is straight forward and doesn't require other libraries than the ones state in the first markdown cell in the notebook. No further modifications are required although they are highly recommended! This notebook is meant to be played around with or for testing purposes and should not be seen as a general purpose neural network class. Furthermore, no guarantee is given for the correctness of all the formulas statet in the notebook.
+to go to SWAN and automatically download this repository.
 
-### Classes
+We will use the default configuration, so you should have this setup
 
-In the "NeuralNetworkRegression/classes" folder you can find a class for importing and exporting root files from and to python numpy arrays. All other classes that are required are introduced in the notebook.
+<img src="img/swan_configuration_highlight.png" alt= “swan_conf” width="50%">
 
-### Example data
+## Tutorials
 
-For the tutorial itself, sample data is either generated directly in the notebook (Section 3, Regression in 1D) or by using prepared data from the folder "NeuralNetworkRegression/LHC22q". Due to time-constraints and computing resources, neither the data-generation of actual ALICE data nor the neural network training on it can be performed within the tutorial. Please use the pretrained model instead ("NeuralNetworkRegression/LHC22q/net.onnx").
+The tutorials will be given using [Jupiter](https://jupyter.org/) Notebooks.
 
+### BDT classification
 
+For this tutorial open the `dummy.ipynb` notebook in the folder `BDTClassification`.
 
-## BDT
+### Neural network regression
+
+For this tutorial open the `NeuralNetworks.ipynb` notebook in the folder `NeuralNetworkRegression`.

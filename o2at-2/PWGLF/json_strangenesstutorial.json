@@ -1,0 +1,80 @@
+{
+    "bc-selection-task": {
+        "processRun2": "false",
+        "processRun3": "true"
+    },
+    "event-selection-task": {
+        "syst": "pp",
+        "isMC": "false",
+        "muonSelection": "0",
+        "processRun2": "false",
+        "processRun3": "true"
+    },
+    "multiplicity-table": {
+        "processRun2": "false",
+        "processRun3": "true"
+    },
+    "lambdakzero-preselector": {
+        "dIfMCgenerateK0Short": "true",
+        "dIfMCgenerateLambda": "true",
+        "dIfMCgenerateAntiLambda": "true",
+        "dIfMCgenerateGamma": "false",
+        "dIfMCgenerateHypertriton": "false",
+        "dIfMCgenerateAntiHypertriton": "false",
+        "ddEdxPreSelectK0Short": "true",
+        "ddEdxPreSelectLambda": "true",
+        "ddEdxPreSelectAntiLambda": "true",
+        "ddEdxPreSelectGamma": "false",
+        "ddEdxPreSelectHypertriton": "false",
+        "ddEdxPreSelectAntiHypertriton": "false",
+        "ddEdxPreSelectionWindow": "7",
+        "dTPCNCrossedRows": "50",
+        "dPreselectOnlyBaryons": "false",
+        "processBuildAll": "true",
+        "processBuildMCAssociated": "false",
+        "processBuildValiddEdx": "false",
+        "processBuildValiddEdxMCAssociated": "false"
+    },
+    "lambdakzero-builder": {
+        "createV0CovMats": "-1",
+        "d_UseAutodetectMode": "true",
+        "dcanegtopv": "0.100000001",
+        "dcapostopv": "0.100000001",
+        "v0cospa": "0.995",
+        "dcav0dau": "1",
+        "v0radius": "0.899999976",
+        "tpcrefit": "0",
+        "d_bz": "-999",
+        "d_UseAbsDCA": "true",
+        "d_UseWeightedPCA": "false",
+        "useMatCorrType": "2",
+        "rejDiffCollTracks": "0",
+        "d_doTrackQA": "false",
+        "ccdb-url": "http:\/\/alice-ccdb.cern.ch",
+        "grpPath": "GLO\/GRP\/GRP",
+        "grpmagPath": "GLO\/Config\/GRPMagField",
+        "lutPath": "GLO\/Param\/MatLUT",
+        "geoPath": "GLO\/Config\/GeometryAligned",
+        "d_doQA": "false",
+        "dQANBinsRadius": "500",
+        "dQANBinsPtCoarse": "10",
+        "dQANBinsMass": "400",
+        "dQAMaxPt": "5",
+        "dQAK0ShortMassWindow": "0.00499999989",
+        "dQALambdaMassWindow": "0.00499999989",
+        "processRun2": "false",
+        "processRun3": "true"
+    },
+    "pid-multiplicity": {
+        "processIU": "true",
+        "processStandard": "false"
+    },
+   "strangeness-step1": {
+        "nBins": "100",
+        "V0_cosPA": "0.97999999999999998",
+        "V0_dcav0dau": "1",
+        "V0_dcapostopv": "0.06",
+        "V0_dcanegtopv": "0.06",
+        "V0_radius": "0.5"
+    }
+}

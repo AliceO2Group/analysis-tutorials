@@ -12,7 +12,12 @@ We will run this tutorial on CERN SWAN, so click here
 
 to go to SWAN and automatically download this repository.
 
-We will use the default configuration, so you should have this setup
+To have the right environment configure SWAN in this way:
+
+- **Software stack**: 102b
+- **Environment script**: /eos/user/a/alicesk/O2AT_ML/setup.sh
+
+You should have this setup
 
 <img src="img/swan_configuration_highlight.png" alt= “swan_conf” width="50%">
 
@@ -22,8 +27,8 @@ The tutorials will be given using [Jupiter](https://jupyter.org/) Notebooks.
 
 ### BDT classification
 
-For this tutorial open the `dummy.ipynb` notebook in the folder `BDTClassification`.
+For this tutorial open the `dummy.ipynb` notebook in the folder `analysis-tutorials/o2at-2/machineLearning/BDTClassification`.
 
 ### Neural network regression
 
-For this tutorial open the `NeuralNetworks.ipynb` notebook in the folder `NeuralNetworkRegression`.
+For this tutorial open the `NeuralNetworks.ipynb` notebook in the folder `analysis-tutorials/o2at-2/machineLearning/NeuralNetworkRegression`.

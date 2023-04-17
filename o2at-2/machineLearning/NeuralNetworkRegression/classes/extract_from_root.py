@@ -1,12 +1,13 @@
 import uproot
-import uproot3
 import numpy as np
 
 
 class load_tree():
 
-    def __init__(self):
+    def __init__(self, num_workers=1):
         super().__init__()
+
+        self.num_workers = num_workers
         
 
     def convert_to_grid(self, key1, all_ttrees, return_with_keys = True, use_vars=0):
@@ -14,13 +15,13 @@ class load_tree():
         val_arr = 0
         key_arr = 0
         for key2 in all_ttrees[key1].keys():
-            if use_vars==0 or (key2.decode() in use_vars):
+            if use_vars==0 or (key2 in use_vars):
                 if count==0:
                     key_arr = np.array([key2])
-                    val_arr = np.array([all_ttrees[key1][key2].array()])
+                    val_arr = np.array([all_ttrees[key1][key2].array(library='np')])
                 else:
                     key_arr = np.append(key_arr, key2)
-                    val_arr = np.append(val_arr, all_ttrees[key1][key2].array())
+                    val_arr = np.append(val_arr, all_ttrees[key1][key2].array(library='np'))
                     val_arr = np.reshape(val_arr, (count+1,-1))
                 count+=1      
         if return_with_keys:
@@ -28,16 +29,27 @@ class load_tree():
         else:
             return list(val_arr.T)
 
-    def print_trees(self, path):
-        Tree = uproot3.open(path)
-        all_ttrees= dict(Tree.allitems(filterclass=lambda cls:issubclass(cls, uproot3.tree.TTreeMethods)))
+    def print_trees(self, path, num_workers=1):
+        Tree = uproot.open(path,
+                           file_handler=uproot.MultithreadedFileSource,
+                           num_workers=num_workers)
+        all_ttrees= dict()
+        for cls in Tree.items():
+            if isinstance(cls[1], uproot.TTree):
+                all_ttrees[cls[0]] = cls[1]
+
         print(all_ttrees)
         return Tree
 
     def load(self, path, limit=np.infty, use_vars=0, key=False, save=False, save_path=[], verbose=False):
 
-        Tree = uproot3.open(path)
-        all_ttrees= dict(Tree.allitems(filterclass=lambda cls:issubclass(cls, uproot3.tree.TTreeMethods)))
+        Tree = uproot.open(path,
+                           file_handler=uproot.MultithreadedFileSource,
+                           num_workers=self.num_workers)
+        all_ttrees= dict()
+        for cls in Tree.items():
+            if isinstance(cls[1], uproot.TTree):
+                all_ttrees[cls[0]] = cls[1]
 
         if key:
             out_keys, out_data = self.convert_to_grid(key, all_ttrees, return_with_keys = True, use_vars=use_vars)

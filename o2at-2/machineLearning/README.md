@@ -8,7 +8,7 @@ Before we start some preliminary steps are needed. Follow them heareafter!
 
 We will run this tutorial on CERN SWAN, so click here
 
-[![Open in SWAN](https://swanserver.web.cern.ch/swanserver/images/badge_swan_white_150.png)](https://cern.ch/swanserver/cgi-bin/go?projurl=https://github.com/fcatalan92/analysis-tutorials.git)
+[![Open in SWAN](https://swanserver.web.cern.ch/swanserver/images/badge_swan_white_150.png)](https://cern.ch/swanserver/cgi-bin/go?projurl=https://github.com/AliceO2Group/analysis-tutorials.git)
 
 to go to SWAN and automatically download this repository.
 

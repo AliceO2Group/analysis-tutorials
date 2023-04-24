@@ -1,7 +1,7 @@
 {
     "internal-dpl-clock": "",
     "internal-dpl-aod-reader": {
-        "aod-file": "AO2D_LFTutorial_22q_Data.root",
+        "aod-file": "AO2D_LFTutorial_21k6_MC.root",
         "time-limit": "0",
         "start-value-enumeration": "0",
         "end-value-enumeration": "-1",
@@ -17,7 +17,7 @@
     },
     "event-selection-task": {
         "syst": "pp",
-        "isMC": "false",
+        "isMC": "true",
         "muonSelection": "0",
         "processRun2": "false",
         "processRun3": "true"
@@ -49,7 +49,7 @@
     },
     "lambdakzero-builder": {
         "createV0CovMats": "-1",
-        "d_UseAutodetectMode": "false",
+        "d_UseAutodetectMode": "true",
         "dcanegtopv": "0.100000001",
         "dcapostopv": "0.100000001",
         "v0cospa": "0.995",
@@ -77,55 +77,17 @@
         "processRun2": "false",
         "processRun3": "true"
     },
-    "cascade-builder": {
-	"d_UseAutodetectMode": "false",
-        "createCascCovMats": "-1",
-        "tpcrefit": "0",
-        "dcabachtopv": "0.0500000007",
-        "cascradius": "0.899999976",
-        "casccospa": "0.949999988",
-        "dcacascdau": "1",
-        "lambdaMassWindow": "0.00999999978",
-        "d_bz": "-999",
-        "d_UseAbsDCA": "true",
-        "d_UseWeightedPCA": "false",
-        "useMatCorrType": "2",
-        "useMatCorrTypeCasc": "2",
-        "rejDiffCollTracks": "0",
-        "d_doTrackQA": "false",
-        "d_doStraTrackQA": "false",
-        "ccdb-url": "http:\/\/alice-ccdb.cern.ch",
-        "grpPath": "GLO\/GRP\/GRP",
-        "grpmagPath": "GLO\/Config\/GRPMagField",
-        "lutPath": "GLO\/Param\/MatLUT",
-        "geoPath": "GLO\/Config\/GeometryAligned",
-        "d_doQA": "false",
-        "dQANBinsRadius": "500",
-        "dQANBinsPtCoarse": "10",
-        "dQANBinsMass": "400",
-        "dQANBinsDCAxy": "200",
-        "dQAMaxPt": "5",
-        "dQAMaxDCA": "1",
-        "dQAXiMassWindow": "0.00499999989",
-        "dQAOmegaMassWindow": "0.00499999989",
-        "processRun2": "false",
-        "processRun3": "true",
-        "processRun3withStrangenessTracking": "false"
-    },
     "pid-multiplicity": {
         "processIU": "true",
         "processStandard": "false"
     },
     "strangeness_tutorial": {
-	"nBins": "100",
+        "nBins": "100",
         "v0setting_dcav0dau": "1",
         "v0setting_dcapostopv": "0.06",
         "v0setting_dcanegtopv": "0.06",
-        "v0setting_cospa": "0.99",
+        "v0setting_cospa": "0.98",
         "v0setting_radius": "0.5",
-        "cascadesetting_cospa": "0.98",
-        "cascadesetting_cascradius": "0.5",
-        "NSigmaTPCPion": "4",
-        "NSigmaTPCProton": "4"
+        "NSigmaTPCPion": "4"
     }
 }

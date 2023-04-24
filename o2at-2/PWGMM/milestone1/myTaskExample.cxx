@@ -43,7 +43,7 @@ struct myExampleTask {
     histos.fill(HIST("eventCounter"), 0.5);
     for (auto& track : tracks) {
       if( track.tpcNClsCrossedRows() < 70 ) continue; //badly tracked
-      if( track.dcaXY() > 0.2) continue; //doesn’t point to primary vertex
+      if( fabs(track.dcaXY()) > 0.2) continue; //doesn’t point to primary vertex
       histos.fill(HIST("etaHistogram"), track.eta());
       histos.fill(HIST("ptHistogram"), track.pt());
     }

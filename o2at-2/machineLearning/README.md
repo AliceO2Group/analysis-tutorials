@@ -61,7 +61,7 @@ source ~/.virtualenvs/O2AT2_ML/bin/activate
 
 ```bash
 pip3 install --upgrade pip setuptools
-pip3 install notebook hipe4ml torch onnx onnxruntime
+pip3 install notebook hipe4ml torch onnx onnxruntime mplhep
 ```
 
 5. Lauch the Jupyter server (from the tutorial repository folder)

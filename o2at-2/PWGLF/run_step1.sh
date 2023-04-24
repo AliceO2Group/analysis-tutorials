@@ -4,4 +4,4 @@ export OPTIONS="-b --configuration json://${PWD}/json_strangenesstutorial.json -
 o2-analysis-timestamp ${OPTIONS} \
 | o2-analysis-event-selection ${OPTIONS} \
 | o2-analysis-lf-lambdakzerobuilder ${OPTIONS} \
-| o2-analysistutorial-lf-strangeness-step0 ${OPTIONS} 
+| o2-analysistutorial-lf-strangeness-step1 ${OPTIONS} 

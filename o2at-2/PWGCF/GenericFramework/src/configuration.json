@@ -1,0 +1,129 @@
+{
+  "track-extension": {
+    "processRun3": "0",
+    "processRun2": "1"
+  },
+  "gfw-tutorial": {
+    "cfgCutVertex": "10",
+    "cfgCutPtPOIMin": "0.2",
+    "cfgCutPtPOIMax": "10",
+    "cfgCutPtMin": "0.2",
+    "cfgCutPtMax": "3.0",
+    "cfgCutEta": "0.8",
+    "cfgCutChi2prTPCcls": "2.5",
+    "cfgUseNch": "0",
+    "cfgNbootstrap": "10",
+    "axisEta": {
+      "values": [
+        20,
+        -1,
+        1
+      ]
+    },
+    "axisVertex": {
+      "values": [
+        10,
+        -10,
+        10
+      ]
+    },
+    "axisPt": {
+      "values": [
+        0,
+        0.2,
+        0.3,
+        0.4,
+        0.5,
+        0.6,
+        0.8,
+        1,
+        1.5,
+        2,
+        3,
+        4,
+        6,
+        10
+      ]
+    },
+    "axisPhi": {
+      "values": [
+        72,
+        0,
+        6.2831853
+      ]
+    },
+    "axisMultiplicity": {
+      "values": [
+        0,
+        0,
+        5,
+        10,
+        20,
+        30,
+        40,
+        50,
+        60,
+        70,
+        80,
+        90
+      ]
+    }
+  },
+  "timestamp-task": {
+    "rct-path": "RCT/RunInformation",
+    "orbit-reset-path": "CTP/Calib/OrbitReset",
+    "ccdb-url": "http://alice-ccdb.cern.ch",
+    "verbose": "0",
+    "isRun2MC": "0"
+  },
+  "multiplicity-table": {
+    "processRun3": "0",
+    "processRun2": "1"
+  },
+  "track-selection": {
+    "isRun3": "0"
+  },
+  "centrality-table": {
+    "estRun2CL1": "-1",
+    "estRun2CL0": "-1",
+    "genname": "",
+    "ccdbpath": "Centrality/Estimators",
+    "ccdburl": "http://alice-ccdb.cern.ch",
+    "estRun2V0M": "-1",
+    "estRun2SPDtks": "-1",
+    "estRun2SPDcls": "-1"
+  },
+  "bc-selection-task": {
+    "processRun3": "0",
+    "processRun2": "1"
+  },
+  "event-selection-task": {
+    "syst": "PbPb",
+    "isMC": "0",
+    "processRun3": "0",
+    "processRun2": "1",
+    "muonSelection": "0",
+    "customDeltaBC": "300"
+  },
+  "bayes-pid": {
+    "param-file-TPC": "",
+    "param-tof-sigma": "TOFReso",
+    "pid-he": "-1",
+    "pid-ka": "1",
+    "param-file-TOF": "",
+    "pid-pi": "1",
+    "pid-pr": "1",
+    "enableTOF": "1",
+    "ccdb-timestamp": "-1",
+    "pid-tr": "-1",
+    "ccdbPathTPC": "Analysis/PID/TPC/Response",
+    "pid-de": "-1",
+    "pid-al": "-1",
+    "ccdbPathTOF": "Analysis/PID/TOF",
+    "enableTPC": "1",
+    "ccdb-url": "http://alice-ccdb.cern.ch",
+    "pid-el": "-1",
+    "pid-mu": "-1"
+  }
+}
+

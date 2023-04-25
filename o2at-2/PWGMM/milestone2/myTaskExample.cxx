@@ -81,11 +81,8 @@ struct myExampleTask {
   {
     for (const auto& track : tracks) {
       if( track.tpcNClsCrossedRows() < 70 ) continue; //badly tracked
-
-      if( track.isAmbiguous() ){
-        histos.fill(HIST("etaHistogramAmbi"), track.eta());
-        histos.fill(HIST("ptHistogramAmbi"), track.pt());
-      }
+      histos.fill(HIST("etaHistogramAmbi"), track.eta());
+      histos.fill(HIST("ptHistogramAmbi"), track.pt());
     }
   }
 };

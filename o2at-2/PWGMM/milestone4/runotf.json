@@ -1,13 +1,21 @@
 {
     "internal-dpl-clock": "",
-    "internal-dpl-aod-reader": "",
+    "internal-dpl-aod-reader": {
+      "time-limit": "0",
+      "orbit-offset-enumeration": "0",
+      "orbit-multiplier-enumeration": "0",
+      "start-value-enumeration": "0",
+      "end-value-enumeration": "-1",
+      "step-value-enumeration": "1",
+      "aod-file": "AO2D.root"
+    },
     "internal-dpl-injected-dummy-sink": "",
     "internal-dpl-aod-spawner": "",
     "on-the-fly-tracker": {
         "maxEta": "1.5",
         "multEtaRange": "0.800000012",
         "minPt": "0.100000001",
-        "enableLUT": "false",
+        "enableLUT": "true",
         "enableNucleiSmearing": "false",
         "lutEl": "lutCovm.el.dat",
         "lutMu": "lutCovm.mu.dat",

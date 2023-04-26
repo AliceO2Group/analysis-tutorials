@@ -18,12 +18,12 @@
 #include "Common/DataModel/Multiplicity.h"
 #include "Common/DataModel/PIDResponse.h"
 #include "CommonConstants/PhysicsConstants.h"
-
-#include "TLorentzVector.h"
+#include "PWGCF/FemtoDream/FemtoDreamMath.h"
 
 using namespace o2;
 using namespace o2::framework;
 using namespace o2::framework::expressions;
+using namespace o2::analysis::femtoDream;
 
 // STEP 2
 // Example task illustrating how to mix elements of different partitions and different events + process switches
@@ -49,7 +49,6 @@ struct CFTutorialTask5 {
   Configurable<float> ConfMaxPtCut{"ConfMaxPtCut", 3.0, "Max Pt cut"};
   Configurable<float> ConfMinPtCut{"ConfMinPtCut", 0.5, "Min Pt cut"};
   Configurable<float> ConfMinNSigmaTPCCut{"ConfMinNSigmaTPCCut", 3., "N-sigma TPC cut"};
-  Configurable<float> ConfChargeCut{"ConfChargeCut", 0., "N-sigma TPC cut"};
 
   // Defining filters
   Filter collisionFilter = (nabs(aod::collision::posZ) < ConfZvtxCut);
@@ -60,8 +59,8 @@ struct CFTutorialTask5 {
   using MyFilteredCollision = MyFilteredCollisions::iterator;
   using MyFilteredTracks = soa::Filtered<o2::aod::MyTracks>;
 
-  Partition<MyFilteredTracks> positive = aod::track::signed1Pt > ConfChargeCut;
-  Partition<MyFilteredTracks> negative = aod::track::signed1Pt < ConfChargeCut;
+  Partition<MyFilteredTracks> positive = aod::track::signed1Pt > 0.f;
+  Partition<MyFilteredTracks> negative = aod::track::signed1Pt < 0.f;
 
   ConfigurableAxis ConfMultBins{"ConfMultBins", {VARIABLE_WIDTH, 0.0f, 20.0f, 40.0f, 60.0f, 80.0f, 100.0f, 200.0f, 99999.f}, "Mixing bins - multiplicity"};
   ConfigurableAxis ConfVtxBins{"ConfVtxBins", {VARIABLE_WIDTH, -10.0f, -8.f, -6.f, -4.f, -2.f, 0.f, 2.f, 4.f, 6.f, 8.f, 10.f}, "Mixing bins - z-vertex"};
@@ -80,15 +79,22 @@ struct CFTutorialTask5 {
 
     // Add histograms to histogram manager (as in the output object of in AliPhysics)
     histos.add("hZvtx", ";Z (cm)", kTH1F, {vtxZAxis});
-    histos.add("hP", ";#it{p} (GeV/#it{c})", kTH1F, {{35, 0.5, 4.}});
-    histos.add("hEta", ";#it{p} (GeV/#it{c})", kTH1F, {{100, -1.5, 1.5}});
-    histos.add("hPt", ";#it{p}_{T} (GeV/#it{c})", kTH1F, {ptAxis});
-    histos.add("hNsigmaTPCP", ";#it{p} (GeV/#it{c}); n#sigma_{TPC}^{#pi}", kTH2F, {{35, 0.5, 4.}, {100, -5., 5.}});
+
     histos.add("hChargePos", ";z;", kTH1F, {{3, -1.5, 1.5}});
+    histos.add("hPPos", ";#it{p} (GeV/#it{c})", kTH1F, {{35, 0.5, 4.}});
+    histos.add("hEtaPos", ";#it{p} (GeV/#it{c})", kTH1F, {{100, -1.5, 1.5}});
+    histos.add("hPtPos", ";#it{p}_{T} (GeV/#it{c})", kTH1F, {ptAxis});
+    histos.add("hNsigmaTPCPos", ";#it{p} (GeV/#it{c}); n#sigma_{TPC}^{proton}", kTH2F, {{35, 0.5, 4.}, {100, -5., 5.}});
+    histos.add("hSEPos", ";#k^{*} (GeV/#it{c})", kTH1F, {{1000, 0., 5.}});
+    histos.add("hMEPos", ";#k^{*} (GeV/#it{c})", kTH1F, {{1000, 0., 5.}});
+
     histos.add("hChargeNeg", ";z;", kTH1F, {{3, -1.5, 1.5}});
-    histos.add("hInvariantMass", ";M_{#pi^{+}#pi^{-}} (GeV/#it{c}^{2});", kTH1F, {{100, 0., 1.0}});
-    histos.add("hInvariantMassMixed", ";M_{#pi^{+}#pi^{-}} (GeV/#it{c}^{2});", kTH1F, {{100, 0., 1.0}});
-    histos.add("hInvariantMassMixedInterface", ";M_{#pi^{+}#pi^{-}} (GeV/#it{c}^{2});", kTH1F, {{100, 0., 1.0}});
+    histos.add("hPNeg", ";#it{p} (GeV/#it{c})", kTH1F, {{35, 0.5, 4.}});
+    histos.add("hEtaNeg", ";#it{p} (GeV/#it{c})", kTH1F, {{100, -1.5, 1.5}});
+    histos.add("hPtNeg", ";#it{p}_{T} (GeV/#it{c})", kTH1F, {ptAxis});
+    histos.add("hNsigmaTPCNeg", ";#it{p} (GeV/#it{c}); n#sigma_{TPC}^{antiproton}", kTH2F, {{35, 0.5, 4.}, {100, -5., 5.}});
+    histos.add("hSENeg", ";#k^{*} (GeV/#it{c})", kTH1F, {{1000, 0., 5.}});
+    histos.add("hMENeg", ";#k^{*} (GeV/#it{c})", kTH1F, {{1000, 0., 5.}});
   }
 
   void processSame(MyFilteredCollision const& coll, MyFilteredTracks const& tracks)
@@ -99,32 +105,37 @@ struct CFTutorialTask5 {
 
     for (auto track : groupPositive) {
       histos.fill(HIST("hChargePos"), track.sign());
-      histos.fill(HIST("hP"), track.p());
-      histos.fill(HIST("hPt"), track.pt());
-      histos.fill(HIST("hEta"), track.eta());
-      histos.fill(HIST("hNsigmaTPCP"), track.p(), track.tpcNSigmaPi());
+      histos.fill(HIST("hPPos"), track.p());
+      histos.fill(HIST("hPtPos"), track.pt());
+      histos.fill(HIST("hEtaPos"), track.eta());
+      histos.fill(HIST("hNsigmaTPCPos"), track.tpcInnerParam(), track.tpcNSigmaPr());
     }
 
     for (auto track : groupNegative) {
       histos.fill(HIST("hChargeNeg"), track.sign());
-      histos.fill(HIST("hP"), track.p());
-      histos.fill(HIST("hPt"), track.pt());
-      histos.fill(HIST("hEta"), track.eta());
-      histos.fill(HIST("hNsigmaTPCP"), track.p(), track.tpcNSigmaPi());
+      histos.fill(HIST("hPNeg"), track.p());
+      histos.fill(HIST("hPtNeg"), track.pt());
+      histos.fill(HIST("hEtaNeg"), track.eta());
+      histos.fill(HIST("hNsigmaTPCNeg"), track.tpcInnerParam(), track.tpcNSigmaPr());
     }
 
-    for (auto& [pos, neg] : combinations(soa::CombinationsFullIndexPolicy(groupPositive, groupNegative))) {
-      if (fabs(pos.tpcNSigmaPi()) > 3 or fabs(neg.tpcNSigmaPi()) > 3) {
+    float kstar = 0.;
+    float mp = constants::physics::MassProton;
+
+    for (auto& [p0, p1] : combinations(soa::CombinationsStrictlyUpperIndexPolicy(groupPositive, groupPositive))) {
+      if (fabs(p0.tpcNSigmaPr()) > 3. || fabs(p1.tpcNSigmaPr() > 3.)) {
         continue;
       }
-      TLorentzVector posVec;
-      posVec.SetPtEtaPhiM(pos.pt(), pos.eta(), pos.phi(), o2::constants::physics::MassPionCharged);
-      TLorentzVector negVec;
-      negVec.SetPtEtaPhiM(neg.pt(), neg.eta(), neg.phi(), o2::constants::physics::MassPionCharged);
+      kstar = FemtoDreamMath::getkstar(p0, mp, p1, mp);
+      histos.fill(HIST("hSEPos"), kstar);
+    }
 
-      TLorentzVector sumVec(posVec);
-      sumVec += negVec;
-      histos.fill(HIST("hInvariantMass"), sumVec.M());
+    for (auto& [p0, p1] : combinations(soa::CombinationsStrictlyUpperIndexPolicy(groupNegative, groupNegative))) {
+      if (fabs(p0.tpcNSigmaPr()) > 3. || fabs(p1.tpcNSigmaPr() > 3.)) {
+        continue;
+      }
+      kstar = FemtoDreamMath::getkstar(p0, mp, p1, mp);
+      histos.fill(HIST("hSENeg"), kstar);
     }
   }
   PROCESS_SWITCH(CFTutorialTask5, processSame, "Enable processing same event", true);
@@ -136,50 +147,27 @@ struct CFTutorialTask5 {
       auto groupPositive = positive->sliceByCached(aod::track::collisionId, collision1.globalIndex());
       auto groupNegative = negative->sliceByCached(aod::track::collisionId, collision2.globalIndex());
 
-      for (auto& [pos, neg] : combinations(soa::CombinationsFullIndexPolicy(groupPositive, groupNegative))) {
-        if (fabs(pos.tpcNSigmaPi()) > 3 or fabs(neg.tpcNSigmaPi()) > 3) {
+      float kstar = 0.;
+      float mp = constants::physics::MassProton;
+
+      for (auto& [p0, p1] : combinations(soa::CombinationsStrictlyUpperIndexPolicy(groupPositive, groupPositive))) {
+        if (fabs(p0.tpcNSigmaPr()) > 3. || fabs(p1.tpcNSigmaPr() > 3.)) {
           continue;
         }
-        TLorentzVector posVec;
-        posVec.SetPtEtaPhiM(pos.pt(), pos.eta(), pos.phi(), o2::constants::physics::MassPionCharged);
-        TLorentzVector negVec;
-        negVec.SetPtEtaPhiM(neg.pt(), neg.eta(), neg.phi(), o2::constants::physics::MassPionCharged);
+        kstar = FemtoDreamMath::getkstar(p0, mp, p1, mp);
+        histos.fill(HIST("hMEPos"), kstar);
+      }
 
-        TLorentzVector sumVec(posVec);
-        sumVec += negVec;
-        histos.fill(HIST("hInvariantMassMixed"), sumVec.M());
+      for (auto& [p0, p1] : combinations(soa::CombinationsStrictlyUpperIndexPolicy(groupNegative, groupNegative))) {
+        if (fabs(p0.tpcNSigmaPr()) > 3. || fabs(p1.tpcNSigmaPr() > 3.)) {
+          continue;
+        }
+        kstar = FemtoDreamMath::getkstar(p0, mp, p1, mp);
+        histos.fill(HIST("hMENeg"), kstar);
       }
     }
   }
   PROCESS_SWITCH(CFTutorialTask5, processMixed, "Enable processing mixed event", true);
-
-  void processMixedEventInterface(MyFilteredCollisions& colls, MyFilteredTracks& tracks)
-  {
-    auto tracksTuple = std::make_tuple(tracks);
-    BinningType colBinning{{ConfVtxBins, ConfMultBins}, true};
-    SameKindPair<MyFilteredCollisions, MyFilteredTracks, BinningType> pair{colBinning, 5, -1, colls, tracksTuple};
-    for (auto& [c1, tracks1, c2, tracks2] : pair) {
-      Partition<MyFilteredTracks> groupPositive = aod::track::signed1Pt > ConfChargeCut;
-      groupPositive.bindTable(tracks1);
-      Partition<MyFilteredTracks> groupNegative = aod::track::signed1Pt < ConfChargeCut;
-      groupNegative.bindTable(tracks2);
-
-      for (auto& [pos, neg] : combinations(soa::CombinationsFullIndexPolicy(groupPositive, groupNegative))) {
-        if (fabs(pos.tpcNSigmaPi()) > 3 or fabs(neg.tpcNSigmaPi()) > 3) {
-          continue;
-        }
-        TLorentzVector posVec;
-        posVec.SetPtEtaPhiM(pos.pt(), pos.eta(), pos.phi(), o2::constants::physics::MassPionCharged);
-        TLorentzVector negVec;
-        negVec.SetPtEtaPhiM(neg.pt(), neg.eta(), neg.phi(), o2::constants::physics::MassPionCharged);
-
-        TLorentzVector sumVec(posVec);
-        sumVec += negVec;
-        histos.fill(HIST("hInvariantMassMixedInterface"), sumVec.M());
-      }
-    }
-  }
-  PROCESS_SWITCH(CFTutorialTask5, processMixedEventInterface, "Enable processing mixed event with standard mixing interface", false);
 };
 
 WorkflowSpec defineDataProcessing(ConfigContext const& cfgc)

@@ -19,12 +19,12 @@
 #include "Common/DataModel/PIDResponse.h"
 #include "CommonConstants/PhysicsConstants.h"
 
-#include "TLorentzVector.h"
+#include "PWGCF/FemtoDream/FemtoDreamMath.h"
 
 using namespace o2;
 using namespace o2::framework;
 using namespace o2::framework::expressions;
-
+using namespace o2::analysis::femtoDream;
 // STEP 2
 // Example task illustrating how to mix elements of different partitions
 
@@ -74,13 +74,20 @@ struct CFTutorialTask4 {
 
     // Add histograms to histogram manager (as in the output object of in AliPhysics)
     histos.add("hZvtx", ";Z (cm)", kTH1F, {vtxZAxis});
-    histos.add("hP", ";#it{p} (GeV/#it{c})", kTH1F, {{35, 0.5, 4.}});
-    histos.add("hEta", ";#it{p} (GeV/#it{c})", kTH1F, {{100, -1.5, 1.5}});
-    histos.add("hPt", ";#it{p}_{T} (GeV/#it{c})", kTH1F, {ptAxis});
-    histos.add("hNsigmaTPCP", ";#it{p} (GeV/#it{c}); n#sigma_{TPC}^{#pi}", kTH2F, {{35, 0.5, 4.}, {100, -5., 5.}});
+
     histos.add("hChargePos", ";z;", kTH1F, {{3, -1.5, 1.5}});
+    histos.add("hPPos", ";#it{p} (GeV/#it{c})", kTH1F, {{35, 0.5, 4.}});
+    histos.add("hEtaPos", ";#it{p} (GeV/#it{c})", kTH1F, {{100, -1.5, 1.5}});
+    histos.add("hPtPos", ";#it{p}_{T} (GeV/#it{c})", kTH1F, {ptAxis});
+    histos.add("hNsigmaTPCPos", ";#it{p} (GeV/#it{c}); n#sigma_{TPC}^{proton}", kTH2F, {{35, 0.5, 4.}, {100, -5., 5.}});
+    histos.add("hkstarPos", ";#k^{*} (GeV/#it{c})", kTH1F, {{1000, 0., 5.}});
+
     histos.add("hChargeNeg", ";z;", kTH1F, {{3, -1.5, 1.5}});
-    histos.add("hInvariantMass", ";M_{#pi^{+}#pi^{-}} (GeV/#it{c}^{2});", kTH1F, {{100, 0., 1.0}});
+    histos.add("hPNeg", ";#it{p} (GeV/#it{c})", kTH1F, {{35, 0.5, 4.}});
+    histos.add("hEtaNeg", ";#it{p} (GeV/#it{c})", kTH1F, {{100, -1.5, 1.5}});
+    histos.add("hPtNeg", ";#it{p}_{T} (GeV/#it{c})", kTH1F, {ptAxis});
+    histos.add("hNsigmaTPCNeg", ";#it{p} (GeV/#it{c}); n#sigma_{TPC}^{antiproton}", kTH2F, {{35, 0.5, 4.}, {100, -5., 5.}});
+    histos.add("hkstarNeg", ";#k^{*} (GeV/#it{c})", kTH1F, {{1000, 0., 5.}});
   }
 
   // Equivalent of the AliRoot task UserExec
@@ -92,34 +99,43 @@ struct CFTutorialTask4 {
 
     for (auto track : groupPositive) {
       histos.fill(HIST("hChargePos"), track.sign());
-      histos.fill(HIST("hP"), track.p());
-      histos.fill(HIST("hPt"), track.pt());
-      histos.fill(HIST("hEta"), track.eta());
-      histos.fill(HIST("hNsigmaTPCP"), track.p(), track.tpcNSigmaPi());
+      histos.fill(HIST("hPPos"), track.p());
+      histos.fill(HIST("hPtPos"), track.pt());
+      histos.fill(HIST("hEtaPos"), track.eta());
+      histos.fill(HIST("hNsigmaTPCPos"), track.tpcInnerParam(), track.tpcNSigmaPr());
     }
 
     for (auto track : groupNegative) {
       histos.fill(HIST("hChargeNeg"), track.sign());
-      histos.fill(HIST("hP"), track.p());
-      histos.fill(HIST("hPt"), track.pt());
-      histos.fill(HIST("hEta"), track.eta());
-      histos.fill(HIST("hNsigmaTPCP"), track.p(), track.tpcNSigmaPi());
+      histos.fill(HIST("hPNeg"), track.p());
+      histos.fill(HIST("hPtNeg"), track.pt());
+      histos.fill(HIST("hEtaNeg"), track.eta());
+      histos.fill(HIST("hNsigmaTPCNeg"), track.tpcInnerParam(), track.tpcNSigmaPr());
     }
 
-    for (auto& [pos, neg] : combinations(soa::CombinationsFullIndexPolicy(groupPositive, groupNegative))) {
-      if (fabs(pos.tpcNSigmaPi()) > 3 or fabs(neg.tpcNSigmaPi()) > 3) {
+    float kstar = 0.;
+    float mp = constants::physics::MassProton;
+
+    // TODO
+    // loop over all distinct proton-proton pairs and compute kstar
+    for (auto& [p0, p1] : combinations(soa::CombinationsStrictlyUpperIndexPolicy(groupPositive, groupPositive))) {
+      if (fabs(p0.tpcNSigmaPr()) > 3. || fabs(p1.tpcNSigmaPr() > 3.)) {
         continue;
       }
-      TLorentzVector posVec;
-      posVec.SetPtEtaPhiM(pos.pt(), pos.eta(), pos.phi(), o2::constants::physics::MassPionCharged);
-      TLorentzVector negVec;
-      negVec.SetPtEtaPhiM(neg.pt(), neg.eta(), neg.phi(), o2::constants::physics::MassPionCharged);
-
-      TLorentzVector sumVec(posVec);
-      sumVec += negVec;
-      histos.fill(HIST("hInvariantMass"), sumVec.M());
+      kstar = FemtoDreamMath::getkstar(p0, mp, p1, mp);
+      histos.fill(HIST("hkstarPos"), kstar);
     }
-  }
+
+    // TODO
+    //   loop over all distinct antiproton-antiproton pairs and compute kstar
+    for (auto& [p0, p1] : combinations(soa::CombinationsStrictlyUpperIndexPolicy(groupNegative, groupNegative))) {
+      if (fabs(p0.tpcNSigmaPr()) > 3. || fabs(p1.tpcNSigmaPr() > 3.)) {
+        continue;
+      }
+      kstar = FemtoDreamMath::getkstar(p0, mp, p1, mp);
+      histos.fill(HIST("hkstarNeg"), kstar);
+    }
+  };
 };
 
 WorkflowSpec defineDataProcessing(ConfigContext const& cfgc)

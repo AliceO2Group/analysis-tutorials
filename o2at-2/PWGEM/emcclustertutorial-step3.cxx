@@ -125,8 +125,7 @@ struct ClusterTutorial {
 
 
       // Track Matching part
-      double dEta, dPhi, pT, abs_p;
-      pT = cluster.energy() / cosh(cluster.eta());
+      double dEta, dPhi;
       auto tracksofcluster = matchedtracks.sliceBy(perClusterMatchedTracks, cluster.globalIndex());
       int t = 0;
       for (const auto& match : tracksofcluster) {

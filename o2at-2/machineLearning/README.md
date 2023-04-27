@@ -23,11 +23,11 @@ You should have this setup
 
 ## Tutorials
 
-The tutorials will be given using [Jupiter](https://jupyter.org/) Notebooks.
+The tutorials will be given using [Jupyter](https://jupyter.org/) Notebooks.
 
 ### BDT classification
 
-For this tutorial open the `dummy.ipynb` notebook in the folder `analysis-tutorials/o2at-2/machineLearning/BDTClassification`.
+For this tutorial open the `OmegaBDT.ipynb` notebook in the folder `analysis-tutorials/o2at-2/machineLearning/BDTClassification`.
 
 ### Neural network regression
 
@@ -37,7 +37,7 @@ For this tutorial open the `NeuralNetworks.ipynb` notebook in the folder `analys
 
 ## "Power-user" setup
 
-If you feel expert enough and you want to run the tutorials on your PC, the following instructions will help you to setup the needed Python environment and to launch the Jupiter notebooks. These instructions are also helpful in case you would like to start you ML project.
+If you feel expert enough and you want to run the tutorials on your PC, the following instructions will help you to setup the needed Python environment and to launch the Jupyter notebooks. These instructions are also helpful in case you would like to start your ML project.
 
 1. Clone this repository
 

@@ -2,7 +2,7 @@
 
 Welcome to the O2AT ML tutorial. Today we will have a look at how to train Boosted Decision Trees (BDTs) in Python and how to export and use a ML model in O2Physics analyses.
 
-Before we start some preliminary steps are needed. Follow them heareafter!
+Before we start some preliminary steps are needed. Follow them hereafter!
 
 ## SWAN setup
 
@@ -37,7 +37,7 @@ Info TOBEADDED
 
 ## "Power-user" setup
 
-If you feel expert enough and you want to run the tutorials on your PC, the following instructions will help you to setup the needed Python environment and to launch the Jupyter notebooks. These instructions are also helpful in case you would like to start your ML project.
+If you feel experienced enough and you want to run the tutorials on your PC, the following instructions will help you to setup the needed Python environment and to launch the Jupyter notebooks. These instructions are also helpful in case you would like to start your ML project.
 
 1. Clone this repository
 

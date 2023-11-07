@@ -19,7 +19,7 @@ To have the right environment configure SWAN in this way:
 
 You should have this setup
 
-<img src="img/swan_configuration_highlight.png" alt= “swan_conf” width="50%">
+<img src="swan_cfg.png" alt= “swan_conf” width="50%">
 
 ## Tutorials
 

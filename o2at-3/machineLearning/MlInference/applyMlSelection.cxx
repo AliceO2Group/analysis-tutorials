@@ -18,8 +18,8 @@
 #include "Framework/HistogramRegistry.h"
 #include "Framework/runDataProcessing.h"
 
+#include "Tools/ML/MlResponse.h"
 #include "PWGHF/Core/HfHelper.h"
-#include "PWGHF/Core/HfMlResponse.h"
 #include "PWGHF/DataModel/CandidateReconstructionTables.h"
 
 using namespace o2;
@@ -40,22 +40,23 @@ struct applyMlSelection {
   Configurable<LabeledArray<double>> cutsMl{"cutsMl", {defaultCutsMl[0], 1, 3, {"pT bin 0"}, {"score prompt", "score non-prompt", "score bkg"}}, "ML selections per pT bin"};
   Configurable<int8_t> nClassesMl{"nClassesMl", (int8_t)3, "Number of classes in ML model"};
   // Model file names
-  Configurable<std::vector<std::string>> onnxFileNames{"onnxFileNames", std::vector<std::string>{"ModelHandler_onnx_DsToKKPi.onnx"}, "ONNX file names for each pT bin (if not from CCDB full path)"};
+  Configurable<std::vector<std::string>> onnxFileNames{"onnxFileNames", std::vector<std::string>{"model_onnx.onnx"}, "ONNX file names for each pT bin (if not from CCDB full path)"};
   // Bonus: CCDB configuration (needed for ML application on the GRID)
   Configurable<bool> loadModelsFromCCDB{"loadModelsFromCCDB", false, "Flag to enable or disable the loading of models from CCDB"};
   Configurable<std::string> ccdbUrl{"ccdbUrl", "http://alice-ccdb.cern.ch", "url of the ccdb repository"};
-  Configurable<std::string> modelPathsCCDB{"modelPathsCCDB", "", "Path on CCDB"};
+  Configurable<std::string> modelPathsCCDB{"modelPathsCCDB", "Users/f/fcatalan/O2AT3/MlInference", "Path on CCDB"};
   Configurable<int64_t> timestampCCDB{"timestampCCDB", -1, "timestamp of the ONNX file for ML model used to query in CCDB"};
-  
+
   Filter filterDsFlag = (o2::aod::hf_track_index::hfflag & static_cast<uint8_t>(BIT(aod::hf_cand_3prong::DecayType::DsToKKPi))) != static_cast<uint8_t>(0);
 
   HfHelper hfHelper;
   o2::ccdb::CcdbApi ccdbApi;
+  int nCandidates = 0;
 
   // Add objects needed for ML inference
-  o2::analysis::HfMlResponse<float> hfMlResponse;
+  o2::analysis::MlResponse<float> mlResponse;
   std::vector<float> outputMl = {};
-  
+
   // Add histograms for other BDT scores and for distributions after selections
   HistogramRegistry registry{
     "registry",
@@ -66,9 +67,7 @@ struct applyMlSelection {
      {"hMassAfterSel", "Ds candidates after selection;inv. mass (KK#pi) (GeV/#it{c}^{2});entries", {HistType::kTH1F, {{100, 1.77, 2.17}}}},
      {"hPromptScoreAfterSel", "Prompt score after selection;BDT first score;entries", {HistType::kTH1F, {{100, 0., 1.}}}},
      {"hNonPromptScoreAfterSel", "Non prompt score after selection;BDT second score;entries", {HistType::kTH1F, {{100, 0., 1.}}}},
-     {"hBkgScoreAfterSel", "Bkg score after selection;BDT third score;entries", {HistType::kTH1F, {{100, 0., 1.}}}}}
-  };
-
+     {"hBkgScoreAfterSel", "Bkg score after selection;BDT third score;entries", {HistType::kTH1F, {{100, 0., 1.}}}}}};
 
   void init(InitContext const&)
   {
@@ -80,20 +79,18 @@ struct applyMlSelection {
     registry.add("hBkgScoreAfterSelVsPt", "Bkg score after selection;BDT third score;entries", {HistType::kTH2F, {{100, 0., 1.}, {vbins, "#it{p}_{T} (GeV/#it{c})"}}});
 
     // Configure and initialise the ML class
-    hfMlResponse.configure(binsPtMl, cutsMl, cutDirMl, nClassesMl);
+    mlResponse.configure(binsPtMl, cutsMl, cutDirMl, nClassesMl);
 
     // Bonus: retrieve the model from CCDB (needed for ML application on the GRID)
     if (loadModelsFromCCDB) {
       ccdbApi.init(ccdbUrl);
-      hfMlResponse.setModelPathsCCDB(onnxFileNames, ccdbApi, modelPathsCCDB.value, timestampCCDB);
+      mlResponse.setModelPathsCCDB(onnxFileNames, ccdbApi, modelPathsCCDB.value, timestampCCDB);
     } else {
-      hfMlResponse.setModelPathsLocal(onnxFileNames);
+      mlResponse.setModelPathsLocal(onnxFileNames);
     }
 
-    hfMlResponse.init();
+    mlResponse.init();
   }
-
-  int nCandidates = 0;
 
   void process(soa::Filtered<aod::HfCand3Prong> const& candidates)
   {
@@ -111,7 +108,7 @@ struct applyMlSelection {
       if (candpT < ptCandMin || candpT > ptCandMax) {
         continue;
       }
-       // Check that the candidate rapidity is within the analysis range
+      // Check that the candidate rapidity is within the analysis range
       if (yCandRecoMax >= 0. && std::abs(hfHelper.yDs(candidate)) > yCandRecoMax) {
         continue;
       }
@@ -131,7 +128,7 @@ struct applyMlSelection {
                                            candidate.maxNormalisedDeltaIP()};
 
       // Retrieve model output and selection outcome
-      bool isSelectedMlPiKK = hfMlResponse.isSelectedMl(inputFeaturesPiKK, candidate.pt(), outputMl);
+      bool isSelectedMlPiKK = mlResponse.isSelectedMl(inputFeaturesPiKK, candidate.pt(), outputMl);
 
       // Fill BDT score histograms before selection
       registry.fill(HIST("hPromptScoreBeforeSel"), outputMl[0]);
@@ -152,7 +149,6 @@ struct applyMlSelection {
 
       outputMl.clear(); // not necessary in this case but for good measure
 
-
       // Perform ML selections for other mass hypothesis (Ds -> PhiPi -> KKPi)
       std::vector<float> inputFeaturesKKPi{candidate.cpa(),
                                            candidate.cpaXY(),
@@ -164,7 +160,7 @@ struct applyMlSelection {
                                            candidate.maxNormalisedDeltaIP()};
 
       // Retrieve model output and selection outcome
-      bool isSelectedMlKKPi = hfMlResponse.isSelectedMl(inputFeaturesPiKK, candidate.pt(), outputMl);
+      bool isSelectedMlKKPi = mlResponse.isSelectedMl(inputFeaturesPiKK, candidate.pt(), outputMl);
 
       // Fill BDT score histograms before selection
       registry.fill(HIST("hPromptScoreBeforeSel"), outputMl[0]);
@@ -183,7 +179,7 @@ struct applyMlSelection {
         registry.fill(HIST("hBkgScoreAfterSelVsPt"), outputMl[2], candidate.pt());
       }
 
-       outputMl.clear(); // not necessary in this case but for good measure
+      outputMl.clear(); // not necessary in this case but for good measure
     }
   }
 };
@@ -192,4 +188,3 @@ WorkflowSpec defineDataProcessing(ConfigContext const& cfgc)
 {
   return WorkflowSpec{adaptAnalysisTask<applyMlSelection>(cfgc)};
 }
-

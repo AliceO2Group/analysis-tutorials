@@ -1,4 +1,4 @@
-# O2AT - Third edition - Machine Learning primer
+# O2AT - Fourth edition - Machine Learning primer
 
 Welcome to the O2AT ML tutorial. Today we will have a look at how to train Boosted Decision Trees (BDTs) in Python and how to export and use a ML model in O2Physics analyses.
 
@@ -19,7 +19,7 @@ To have the right environment configure SWAN in this way:
 
 You should have this setup
 
-<img src="swan_cfg.png" alt= “swan_conf” width="50%">
+<img src="swan_conf.png" alt= “swan_conf” width="50%">
 
 ## Tutorials
 

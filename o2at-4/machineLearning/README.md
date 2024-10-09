@@ -14,8 +14,8 @@ to go to SWAN and automatically download this repository.
 
 To have the right environment configure SWAN in this way:
 
-- **Software stack**: 104a
-- **Environment script**: /eos/user/a/alicesk/O2AT_ML_3/setup.sh
+- **Software stack**: 105a
+- **Environment script**: /eos/user/a/alicesk/O2AT_ML_4/setup.sh
 
 You should have this setup
 

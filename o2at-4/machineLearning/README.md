@@ -33,7 +33,7 @@ For this tutorial you need to compile and run code on your laptop. You will find
 
 You need also some data to test the inference task. To download the AO2D file necessary, you can use the following command
 ```bash
-curl -L https://cernbox.cern.ch/s/0gqE44ggCn1y6qJ/download --output AO2D_MC_Ds.root
+curl -L https://cernbox.cern.ch/s/uIR0aumtfT14NIm/download --output AO2D_MC_Ds.root
 ```
 It will take some time to complete.
 

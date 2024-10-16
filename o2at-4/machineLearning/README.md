@@ -25,7 +25,7 @@ You should have this setup
 
 ### BDT classification
 
-This tutorial will be given using [Jupyter](https://jupyter.org/) Notebooks. Open the `DsBDTrun3.ipynb` notebook in the folder `analysis-tutorials/o2at-4/machineLearning/BDTClassification`.
+This tutorial will be given using [Jupyter](https://jupyter.org/) Notebooks. Open the `DsBDTrun3.ipynb` notebook in the folder `analysis-tutorials/o2at-4/machineLearning/MlClassification`.
 
 ### Inference in O2Physics
 

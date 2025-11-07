@@ -25,18 +25,18 @@ You should have this setup
 
 ### BDT classification
 
-This tutorial will be given using [Jupyter](https://jupyter.org/) Notebooks. Open the `DsBDTrun3.ipynb` notebook in the folder `analysis-tutorials/o2at-4/machineLearning/MlClassification`.
+This tutorial will be given using [Jupyter](https://jupyter.org/) Notebooks. Open the `DsBDTrun3.ipynb` notebook in the folder `analysis-tutorials/o2at-5/machineLearning/MlClassification`.
 
 ### Inference in O2Physics
 
-For this tutorial you need to compile and run code on your laptop. You will find the skeleton task `applyMlSelection.cxx` in the folder `Tutorials/ML` of your clone of the O2Physics repository, together with a JSON configuration file `dpl-config_applyMlSelection.json` and a script to run the analysis workflow `run_applyMlSelection.sh`.
+For this tutorial you need to compile and run code on your laptop. You will find the skeleton task `applyMlSelection.cxx` in the folder `Tutorials/ML` of your clone of the O2Physics repository, together with a JSON configuration file `config.json` and a script to run the analysis workflow `run_applyMlSelection.sh`.
 
 You need also some data to test the inference task. To download the AO2D file necessary, you can use the following command
 ```bash
 curl -L https://cernbox.cern.ch/s/uIR0aumtfT14NIm/download --output AO2D_MC_Ds.root
 ```
 It will take some time to complete.
-
+To run the analysis, you will have to specify the path to the `AO2D_MC_Ds.root` file in the running script (`run_applyMlSelection.sh`).
 ---
 
 ## "Power-user" setup

@@ -468,7 +468,10 @@
         "processMonteCarloWithPID": "false"
     },
     "my-example-task": {
-        "nBinsPt": "100"
+        "nBinsPt": "500",
+        "maxDCAxy": "0.200000003",
+        "minTPCCrossedRows": "70",
+        "maxPVz": "100"
     },
     "internal-dpl-aod-writer": "",
     "internal-dpl-aod-global-analysis-file-sink": "",

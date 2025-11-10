@@ -14,7 +14,7 @@ to go to SWAN and automatically download this repository.
 
 To have the right environment configure SWAN in this way:
 
-- **Software stack**: 105a
+- **Software stack**: 108
 - **Environment script**: /eos/user/a/alicesk/O2AT_ML_5/setup.sh
 
 You should have this setup
@@ -33,7 +33,7 @@ For this tutorial you need to compile and run code on your laptop. You will find
 
 You need also some data to test the inference task. To download the AO2D file necessary, you can use the following command
 ```bash
-curl -L https://cernbox.cern.ch/s/uIR0aumtfT14NIm/download --output AO2D_MC_Ds.root
+curl -L https://cernbox.cern.ch/s/TrKZed4hzNI5RDL/download --output AO2D_MC_Ds.root
 ```
 It will take some time to complete.
 To run the analysis, you will have to specify the path to the `AO2D_MC_Ds.root` file in the running script (`run_applyMlSelection.sh`).

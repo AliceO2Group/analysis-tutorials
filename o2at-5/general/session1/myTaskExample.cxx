@@ -41,7 +41,7 @@ struct myExampleTask {
     histos.add("ptHistogram", "ptHistogram", kTH1F, {axisPt});
   }
 
-  void process(aod::Collision const&, soa::Join<aod::Tracks, aod::TracksExtra, aod::TracksDCA> const& tracks)
+  void process(aod::Collision const& collision, soa::Join<aod::Tracks, aod::TracksExtra, aod::TracksDCA> const& tracks)
   {
     if(fabs(collision.posZ())>maxPVz){
       return; // skip outside a certain region

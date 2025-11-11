@@ -119,9 +119,9 @@ struct myExampleTask {
     //Loop over particles in this mcCollision (first argument of process: iterator)
     for (const auto& mcParticle : mcParticles) {
       if(mcParticle.isPhysicalPrimary() && fabs(mcParticle.y())<0.5){ // do this in the context of the MC loop ! (context matters!!!)
-        if(abs(mcParticle.pdgCode())==211) histos.fill(HIST("ptGeneratedPion"), mcParticle.pt());
-        if(abs(mcParticle.pdgCode())==321) histos.fill(HIST("ptGeneratedKaon"), mcParticle.pt());
-        if(abs(mcParticle.pdgCode())==2212) histos.fill(HIST("ptGeneratedProton"), mcParticle.pt());
+        if(abs(mcParticle.pdgCode())==kPiPlus) histos.fill(HIST("ptGeneratedPion"), mcParticle.pt());
+        if(abs(mcParticle.pdgCode())==kKPlus) histos.fill(HIST("ptGeneratedKaon"), mcParticle.pt());
+        if(abs(mcParticle.pdgCode())==kProton) histos.fill(HIST("ptGeneratedProton"), mcParticle.pt());
       }
     }
   }

@@ -65,7 +65,7 @@ source ~/.virtualenvs/O2AT5_ML/bin/activate
 
 ```bash
 pip3 install --upgrade pip setuptools
-pip3 install notebook hipe4ml hipe4ml_converter
+pip3 install notebook hipe4ml onnxmltools==1.12.0 onnxconverter-common==1.16.0
 ```
 
 5. Lauch the Jupyter server (from the tutorial repository folder)

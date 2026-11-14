@@ -1,0 +1,13 @@
+{ "OutputDirector": {
+  "debug_mode": true,
+  "resfile": "AO2D",
+  "OutputDescriptors": [
+    {
+      "table": "AOD/DRCOLLISION/0"
+    },
+    {
+      "table": "AOD/DRTRACK/0"
+    }
+  ],
+  "ntfmerge": 1
+} }

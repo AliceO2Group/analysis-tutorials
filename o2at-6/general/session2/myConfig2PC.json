@@ -1,0 +1,32 @@
+{
+    "internal-dpl-clock": "",
+    "internal-dpl-aod-reader": {
+        "aod-file-private": "AO2D-derived-tiny.root",
+        "aod-max-io-rate": "0",
+        "aod-reader-backend": "root",
+        "aod-reader-threads": "1",
+        "aod-reader-prefetch": "1",
+        "aod-reader-local-io": "pread",
+        "aod-reader-buffer-mb": "-1",
+        "time-limit": "0",
+        "orbit-offset-enumeration": "0",
+        "orbit-multiplier-enumeration": "0",
+        "start-value-enumeration": "0",
+        "end-value-enumeration": "-1",
+        "step-value-enumeration": "1"
+    },
+    "derived-basic-consumer": {
+        "associatedMinPt": "4",
+        "associatedMaxPt": "6",
+        "triggerMinPt": "6",
+        "axisPt": {
+            "values": [
+                "200",
+                "0",
+                "20"
+            ]
+        }
+    },
+    "internal-dpl-aod-global-analysis-file-sink": "",
+    "internal-dpl-injected-dummy-sink": ""
+}
